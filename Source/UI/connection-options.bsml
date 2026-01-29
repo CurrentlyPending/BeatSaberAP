@@ -1,0 +1,30 @@
+<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+  <vertical>
+    <horizontal>
+      <text text="Host: " font-size="6.5" align="Center"/>
+      <text id="hostOut" text="" font-size="6.5" align="Center"/>
+      <button click-event="ShowInputKeyboardHost" text="Input"/>
+      <modal-keyboard clear-on-open="true" show-event="ShowInputKeyboardHost" on-enter="enteredHost"/>
+    </horizontal>
+    <horizontal>
+      <text text="Port: " font-size="6.5" align="Center"/>
+      <text id="portOut" text="" font-size="6.5" align="Center"/>
+      <button click-event="ShowInputKeyboardPort" text="Input"/>
+      <modal-keyboard clear-on-open="true" show-event="ShowInputKeyboardPort" on-enter="enteredPort"/>
+    </horizontal>
+    <horizontal>
+      <text text="Slot: " font-size="6.5" align="Center"/>
+      <text id="slotOut" text="" font-size="6.5" align="Center"/>
+      <button click-event="ShowInputKeyboardSlot" text="Input"/>
+      <modal-keyboard clear-on-open="true" show-event="ShowInputKeyboardSlot" on-enter="enteredSlot"/>
+    </horizontal>
+    <horizontal>
+      <text text="Password: " font-size="6.5" align="Center"/>
+      <text id="passOut" text="" font-size="6.5" align="Center"/>
+      <button click-event="ShowInputKeyboardPass" text="Input"/>
+      <modal-keyboard clear-on-open="true" show-event="ShowInputKeyboardPass" on-enter="enteredPass"/>
+    </horizontal>
+    <action-button on-click='clickedConnect' text='Connect' anchor-pos-y='-70' pref-width='34' pref-height='10'></action-button>
+    <text id="connectionStatus" text="" font-size="6.5" align="Center"/>
+  </vertical>
+</bg>
