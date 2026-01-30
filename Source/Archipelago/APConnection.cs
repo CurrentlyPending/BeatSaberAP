@@ -124,8 +124,6 @@ public static class APConnection {
 
     private static void RecvItem(ReceivedItemsHelper helper) {
         ItemInfo item = helper.DequeueItem();
-
-        if()
         Plugin.Log.Info($"Item index: {helper.Index}");
 
 
