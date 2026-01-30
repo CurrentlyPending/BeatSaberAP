@@ -12,14 +12,28 @@ static class PlaylistLoadHook {
     static readonly Dictionary<string, string> identCache = new();
 
     static void Prefix(ref IReadOnlyList<BeatmapLevel> beatmapLevels) {
+        if (originalLevels == null) {
+
+            //Ensures SetData has had some time to load in some songs
+            if(beatmapLevels.Count > 50) {
+                originalLevels = beatmapLevels;
+                APConnection.StartIdentBuild(originalLevels);
+            } else {
+                beatmapLevels = Array.Empty<BeatmapLevel>();
+                return;
+            }
+            
+        }
+
         if (APConnection.session == null) {
             beatmapLevels = Array.Empty<BeatmapLevel>();
             return;
         }
-
-        if (originalLevels == null) {
-            originalLevels = beatmapLevels;
-            APConnection.StartIdentBuild(originalLevels);
+        
+        if (!APConnection._identReady) {
+            beatmapLevels = Array.Empty<BeatmapLevel>(); 
+            Plugin.Log.Info("Identity cache constructing...");
+            return;
         }
 
         beatmapLevels = originalLevels.Where(level => {

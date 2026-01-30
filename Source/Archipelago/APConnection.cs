@@ -29,7 +29,7 @@ public static class APConnection {
 
     private static readonly Dictionary<string, string> _identCache = new();
     private static Task _identBuildTask;
-    private static volatile bool _identReady;
+    public static volatile bool _identReady = false;
 
     static readonly FieldInfo tableViewField =
     typeof(LevelCollectionTableView)
@@ -124,8 +124,6 @@ public static class APConnection {
 
     private static void RecvItem(ReceivedItemsHelper helper) {
         ItemInfo item = helper.DequeueItem();
-
-        if()
         Plugin.Log.Info($"Item index: {helper.Index}");
 
 
