@@ -7,31 +7,40 @@ using System.Reflection;
 using System.Text;
 
 [HarmonyPatch(typeof(LevelCollectionTableView), nameof(LevelCollectionTableView.SetData))]
-static class HideEverythingTest {
+static class PlaylistLoadHook {
+    static IReadOnlyList<BeatmapLevel> originalLevels;
+    static readonly Dictionary<string, string> identCache = new();
+
     static void Prefix(ref IReadOnlyList<BeatmapLevel> beatmapLevels) {
-        if (APConnection.session == null) { 
-            beatmapLevels = new BeatmapLevel[0];
-            Plugin.Log.Info("Hiding all songs, no AP session.");
+        if (APConnection.session == null) {
+            beatmapLevels = Array.Empty<BeatmapLevel>();
             return;
         }
-        int unlocked = APConnection.song_items_received;
-        Plugin.Log.Info($"Hiding songs, unlocked count: {unlocked}");
-        beatmapLevels = beatmapLevels.Where(level => {
-            var key = level.GetBeatmapKeys().FirstOrDefault();
-            Plugin.Log.Info($"Checking song with key {key}");
-            if (key == null) {
-                return false;
+
+        if (originalLevels == null) {
+            originalLevels = beatmapLevels;
+            APConnection.StartIdentBuild(originalLevels);
+        }
+
+        beatmapLevels = originalLevels.Where(level => {
+            if (!APConnection.TryGetIdent(level.levelID, out var ident)) { 
+                Plugin.Log.Warn("Ident not yet built, could not generate beatmap list");
+                return false; // ident not ready yet
             }
-            var identTask = APConnection.GenerateIdentAsync(key);
-            identTask.Wait();
-            var ident = identTask.Result;
-            bool isUnlocked = APConnection.IsSongUnlocked(ident);
-            if (isUnlocked) {
-                Plugin.Log.Info($"Showing song: {level.songName} by {level.songAuthorName} (ident: {ident})");
-            } else {
-                Plugin.Log.Info($"Hiding song: {level.songName} by {level.songAuthorName} (ident: {ident})");
-            }
-            return isUnlocked;
+
+            string hexId = ident.Split('_')[0];
+            return APConnection.song_unlocks.Any(s => s.StartsWith(hexId + "_"));
         }).ToList();
+
+        Plugin.Log.Info($"Filtered playlist from {originalLevels.Count} to {beatmapLevels.Count} beatmaps.");
+
+        for (int i = 0; i < beatmapLevels.Count; i++) {
+            var level = beatmapLevels[i];
+            if (!APConnection.TryGetIdent(level.levelID, out var ident)) {
+                Plugin.Log.Warn("Ident not yet built, could not generate beatmap list");
+                continue; // ident not ready yet
+            }
+            Plugin.Log.Debug($"Included beatmap {i}: levelID='{level.levelID}', ident='{ident}'");
+        }
     }
 }

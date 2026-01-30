@@ -1,12 +1,13 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using HarmonyLib;
+﻿using HarmonyLib;
 using IPA;
 using IPA.Logging;
 using SiraUtil.Zenject;
 using SongDetailsCache;
 using SongDetailsCache.Structs;
+using System;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using UnityEngine;
 using Zenject;
 
 namespace BeatSaberAP
@@ -16,12 +17,12 @@ namespace BeatSaberAP
     {
         private Harmony harmony = null!;
         private static Task<SongDetails> sdtask;
-        public static Logger Log { get; private set; }
+        public static IPA.Logging.Logger Log { get; private set; }
 
         // setup that does not require game code
         // this is only called once ever, so do once-ever initialization
         [Init]
-        public Plugin(Logger logger, Zenjector zenjector)
+        public Plugin(IPA.Logging.Logger logger, Zenjector zenjector)
         {
             Log = logger;
             Log.Debug("BeatSaberAP plugin running!");
@@ -37,6 +38,8 @@ namespace BeatSaberAP
             harmony = Harmony.CreateAndPatchAll(typeof(Plugin).Assembly);
 
             sdtask = SongDetails.Init();
+            new GameObject("BeatSaberAP_MainThreadDispatcher")
+                .AddComponent<MainThreadDispatcher>();
         }
 
         public static async Task<uint> GetMapIDFromHashAsync(string hash) {

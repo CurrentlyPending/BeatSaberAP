@@ -6,11 +6,16 @@ using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
 using BeatSaberAP;
 using CustomCampaigns.UI.FlowCoordinators;
+using HMUI;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using UnityEngine;
+using IPA.Utilities;
 
 public static class APConnection {
 
@@ -21,6 +26,14 @@ public static class APConnection {
     public static readonly List<string> song_unlocks = [];
     public static string CampaignName { get; private set; }
     public static int song_items_received = 0;
+
+    private static readonly Dictionary<string, string> _identCache = new();
+    private static Task _identBuildTask;
+    private static volatile bool _identReady;
+
+    static readonly FieldInfo tableViewField =
+    typeof(LevelCollectionTableView)
+        .GetField("_tableView", BindingFlags.Instance | BindingFlags.NonPublic);
 
     public static bool ConnectAndGetSlotData(string host, int port, string slot, string password) {
         session = ArchipelagoSessionFactory.CreateSession(host, port);
@@ -47,10 +60,27 @@ public static class APConnection {
         NodeToIdent = JsonConvert.DeserializeObject<Dictionary<uint,string>>(success.SlotData["node_to_keystr"].ToString());
         IdentToNode = JsonConvert.DeserializeObject<Dictionary<string,uint>>(success.SlotData["keystr_to_node"].ToString());
         song_unlocks.AddRange(JsonConvert.DeserializeObject<List<string>>(success.SlotData["start_songs"].ToString()));
+
+        //Sync Item Counts
+        song_items_received = 0;
+        Plugin.Log.Info("Songs already in inventory: ");
+        foreach (ItemInfo i in session.Items.AllItemsReceived) {
+            if (i.ItemName == "Progressive Song Unlock") {
+                song_items_received++;
+                if (song_items_received <= NodeToIdent.Count) {
+                    int nodeToUnlock = song_items_received; // Progressive: item 1 unlocks node 1, etc.
+
+                    if (NodeToIdent.ContainsKey((uint)nodeToUnlock)) {
+                        song_unlocks.Add(NodeToIdent[(uint)nodeToUnlock]);
+                    }
+                    Plugin.Log.Info(song_unlocks[nodeToUnlock]);
+                }
+            }
+        }
+        Plugin.Log.Info($"Connection established, {song_items_received} songs in inventory.");
+
         session.Items.ItemReceived += RecvItem;
 
-        // Refresh all songs after connecting
-        SongCore.Loader.Instance.RefreshSongs(false);
         return true;
     }
 
@@ -65,10 +95,18 @@ public static class APConnection {
     }
 
     public static async void CheckLocation(BeatmapKey key) {
+        // Use GenerateIdentAsync which properly handles the prefix stripping
+        string ident = await GenerateIdentAsync(key);
 
-        uint levelid = await Plugin.GetMapIDFromHashAsync(key.levelId);
-        string levelIdHex = levelid.ToString("X");
-        string characteristic = key.beatmapCharacteristic.serializedName;
+        // Extract just the levelid hex and characteristic from the ident
+        string[] parts = ident.Split('_');
+        if (parts.Length < 2) {
+            Plugin.Log.Warn($"Invalid ident format: {ident}");
+            return;
+        }
+
+        string levelIdHex = parts[0];
+        string characteristic = parts[1];
 
         // Find ANY keystr that matches this levelid + characteristic (ignoring difficulty)
         var matchingEntry = IdentToNode.FirstOrDefault(kvp =>
@@ -86,19 +124,51 @@ public static class APConnection {
 
     private static void RecvItem(ReceivedItemsHelper helper) {
         ItemInfo item = helper.DequeueItem();
+
+        if()
+        Plugin.Log.Info($"Item index: {helper.Index}");
+
+
+        Plugin.Log.Info("Printing currently received items: ");
+        foreach(ItemInfo i in helper.AllItemsReceived) {
+
+            Plugin.Log.Info(i.ItemDisplayName);
+        }
+
         if (item.ItemName == "Progressive Song Unlock") {
             song_items_received++;
 
-
             if (song_items_received <= NodeToIdent.Count) {
                 int nodeToUnlock = song_items_received; // Progressive: item 1 unlocks node 1, etc.
+                
                 if (NodeToIdent.ContainsKey((uint)nodeToUnlock)) {
                     song_unlocks.Add(NodeToIdent[(uint)nodeToUnlock]);
                 }
+                Plugin.Log.Info("Currently received songs: ");
+                for(int i=0; i < song_unlocks.Count; i++) {
+                    Plugin.Log.Info(song_unlocks[i]);
+                }
+
             }
         }
         Plugin.Log.Info("Received item " + item.ItemId + " (" + song_items_received + " total song items)");
+        TriggerSongListRefresh();
     }
+
+    static void TriggerSongListRefresh() {
+        MainThreadDispatcher.Enqueue(() => {
+            var table = Resources
+                .FindObjectsOfTypeAll<LevelCollectionTableView>()
+                .FirstOrDefault();
+
+            if (table == null)
+                return;
+
+            var tv = tableViewField.GetValue(table) as TableView;
+            tv?.ReloadData();
+        });
+    }
+
 
     public static async Task<bool> HaveSong(BeatmapKey key) {
         string ident = await GenerateIdentAsync(key);
@@ -106,6 +176,7 @@ public static class APConnection {
         return song_unlocks.Contains(ident);
     }
     public static bool IsSongUnlocked(string ident) {
+        Plugin.Log.Debug("Checking unlock for: " + ident);
         return song_unlocks.Contains(ident);
     }
 
@@ -124,6 +195,42 @@ public static class APConnection {
         // Campaign is correct
         return CampaignValidity.Correct;
     }
+
+    public static bool TryGetIdent(string levelId, out string ident) {
+        lock (_identCache) {
+            return _identCache.TryGetValue(levelId, out ident);
+        }
+    }
+
+    public static void StartIdentBuild(IEnumerable<BeatmapLevel> levels) {
+        if (_identBuildTask != null)
+            return;
+
+        Plugin.Log.Info("Starting building identities...");
+
+        _identBuildTask = Task.Run(async () => {
+            foreach (var level in levels) {
+                try {
+                    var key = level.GetBeatmapKeys().FirstOrDefault();
+                    if (key == null)
+                        continue;
+
+                    var ident = await GenerateIdentAsync(key);
+
+                    lock (_identCache) {
+                        _identCache[level.levelID] = ident;
+                    }
+                } catch (Exception ex) {
+                    Plugin.Log.Warn($"Ident build failed for {level.levelID}: {ex}");
+                }
+            }
+
+            _identReady = true;
+        });
+        Plugin.Log.Info("Identity Build Complete.");
+    }
+
+    public static bool AreIdentsReady => _identReady;
 
     public static async Task<string> GenerateIdentAsync(BeatmapKey key) {
         // Normalize level id (remove common prefixes that appear in gameplay)
