@@ -22,7 +22,7 @@ public class LockHooks : IInitializable, IDisposable {
         // Probably not needed
         _playButton = null;
     }
-
+    /*
     [HarmonyPostfix, HarmonyPatch(typeof(CustomCampaignManager), "OnDidSelectMissionNode")]
     private static void HookMissionSelect(CustomCampaignManager __instance, MissionNodeVisualController missionNodeVisualController) {
         APConnection.CampaignValidity validity = APConnection.CheckCampaignValid(__instance.Campaign.info.name);
@@ -59,4 +59,5 @@ public class LockHooks : IInitializable, IDisposable {
             _playButton.SetButtonText("AP: Missing Song Item");
         }
     }
+    */
 }

@@ -12,17 +12,12 @@ static class PlaylistLoadHook {
     static readonly Dictionary<string, string> identCache = new();
 
     static void Prefix(ref IReadOnlyList<BeatmapLevel> beatmapLevels) {
-        if (originalLevels == null) {
-
-            //Ensures SetData has had some time to load in some songs
-            if(beatmapLevels.Count > 50) {
-                originalLevels = beatmapLevels;
-                APConnection.StartIdentBuild(originalLevels);
-            } else {
-                beatmapLevels = Array.Empty<BeatmapLevel>();
-                return;
-            }
-            
+        Plugin.Log.Info($"[PlaylistLoadHook] Called with {beatmapLevels?.Count ?? -1} songs. originalLevels is {(originalLevels == null ? "null" : "set")}. Session is {(APConnection.session == null ? "null" : "connected")}");
+        
+        if (originalLevels == null && beatmapLevels.Count > 0) {
+            Plugin.Log.Info($"Initializing with {beatmapLevels.Count} songs");
+            originalLevels = beatmapLevels;
+            APConnection.StartIdentBuild(originalLevels);
         }
 
         if (APConnection.session == null) {
@@ -42,8 +37,32 @@ static class PlaylistLoadHook {
                 return false; // ident not ready yet
             }
 
-            string hexId = ident.Split('_')[0];
-            return APConnection.song_unlocks.Any(s => s.StartsWith(hexId + "_"));
+            // Extract the identifier portion (everything before characteristic)
+            // For custom maps: "43A2E_Standard_4" -> "43A2E"
+            // For official maps: "OST_100Bills_Standard_2" -> "OST_100Bills"
+            string mapIdentifier;
+            if (ident.StartsWith("OST_")) {
+                // For official maps, we need to get "OST_<levelid>"
+                // Split and take first 2 parts: ["OST", "100Bills", "Standard", "2"]
+                var parts = ident.Split('_');
+                if (parts.Length < 3) {
+                    Plugin.Log.Warn($"Invalid official map ident format: {ident}");
+                    return false;
+                }
+                mapIdentifier = parts[0] + "_" + parts[1]; // "OST_100Bills"
+            } else {
+                // For custom maps, just take the hex ID (first part)
+                mapIdentifier = ident.Split('_')[0]; // "43A2E"
+            }
+
+            // Check if any unlocked song matches this map identifier
+            bool isUnlocked = APConnection.song_unlocks.Any(s => s.StartsWith(mapIdentifier + "_"));
+
+            if (isUnlocked) {
+                Plugin.Log.Debug($"Map unlocked - levelID: {level.levelID}, ident: {ident}, identifier: {mapIdentifier}");
+            }
+
+            return isUnlocked;
         }).ToList();
 
         Plugin.Log.Info($"Filtered playlist from {originalLevels.Count} to {beatmapLevels.Count} beatmaps.");

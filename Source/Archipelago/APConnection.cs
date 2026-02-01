@@ -233,15 +233,29 @@ public static class APConnection {
     public static async Task<string> GenerateIdentAsync(BeatmapKey key) {
         // Normalize level id (remove common prefixes that appear in gameplay)
         string raw = key.levelId ?? string.Empty;
+        bool isCustomLevel = false;
+
         if (raw.StartsWith("custom_level_", StringComparison.OrdinalIgnoreCase)) {
             raw = raw.Substring("custom_level_".Length);
+            isCustomLevel = true;
         } else if (raw.StartsWith("level_", StringComparison.OrdinalIgnoreCase)) {
             raw = raw.Substring("level_".Length);
         }
 
-        // Use normalized id for map lookup
-        uint levelid = await Plugin.GetMapIDFromHashAsync(raw);
-        Plugin.Log.Info(levelid.ToString("X") + "_" + key.beatmapCharacteristic.SerializedName() + "_" + ((int)key.difficulty));
-        return levelid.ToString("X") + "_" + key.beatmapCharacteristic.SerializedName() + "_" + ((int)key.difficulty);
+        string identifier;
+
+        if (isCustomLevel) {
+            // For custom maps, use BeatSaver ID
+            uint levelid = await Plugin.GetMapIDFromHashAsync(raw);
+            identifier = levelid.ToString("X");
+        } else {
+            // For official maps, use the levelID directly (after removing prefix)
+            // Format: "OST_<levelId>" to distinguish from custom maps
+            identifier = "OST_" + raw;
+        }
+
+        string fullIdent = identifier + "_" + key.beatmapCharacteristic.SerializedName() + "_" + ((int)key.difficulty);
+        Plugin.Log.Info("Generated ident: " + fullIdent);
+        return fullIdent;
     }
 }
