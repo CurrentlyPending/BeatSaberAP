@@ -1,6 +1,7 @@
 # Beat Saber Archipelago Client Mod
 <br/>
 # How to Install Client Mod (for PCVR)
+
 1. Download BSManager (https://www.bsmanager.io/)
 2. Install an instance of v1.40.8 (if you already have one, I recommend making a separate one for Archipelago)
 3. Install Dependencies:
