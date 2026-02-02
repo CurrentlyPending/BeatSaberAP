@@ -40,6 +40,7 @@ namespace BeatSaberAP
             sdtask = SongDetails.Init();
             new GameObject("BeatSaberAP_MainThreadDispatcher")
                 .AddComponent<MainThreadDispatcher>();
+            ArchipelagoLevelIndex.Initialize();
         }
 
         public static async Task<uint> GetMapIDFromHashAsync(string hash) {

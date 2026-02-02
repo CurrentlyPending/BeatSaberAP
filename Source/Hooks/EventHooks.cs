@@ -1,5 +1,4 @@
 using BeatSaberAP;
-using CustomCampaigns.UI.FlowCoordinators;
 using HarmonyLib;
 using IPA.Utilities;
 using System;

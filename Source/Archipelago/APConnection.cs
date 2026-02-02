@@ -5,7 +5,6 @@ using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
 using BeatSaberAP;
-using CustomCampaigns.UI.FlowCoordinators;
 using HMUI;
 using Newtonsoft.Json;
 using System;
@@ -63,7 +62,10 @@ public static class APConnection {
 
         //Sync Item Counts
         song_items_received = 0;
+        //First song is always unlocked
+
         Plugin.Log.Info("Songs already in inventory: ");
+        Plugin.Log.Info(song_unlocks[0]);
         foreach (ItemInfo i in session.Items.AllItemsReceived) {
             if (i.ItemName == "Progressive Song Unlock") {
                 song_items_received++;
@@ -183,6 +185,7 @@ public static class APConnection {
         WrongCampaign,
         Correct
     }
+    /*
     public static CampaignValidity CheckCampaignValid(string name) {
         string selected = CustomCampaignFlowCoordinator.CustomCampaignManager.Campaign.info.name;
         if (!selected.StartsWith("AP Campaign, ")) return CampaignValidity.NotAP; // None of our business
@@ -193,7 +196,7 @@ public static class APConnection {
         // Campaign is correct
         return CampaignValidity.Correct;
     }
-
+    */
     public static bool TryGetIdent(string levelId, out string ident) {
         lock (_identCache) {
             return _identCache.TryGetValue(levelId, out ident);
@@ -214,6 +217,7 @@ public static class APConnection {
                         continue;
 
                     var ident = await GenerateIdentAsync(key);
+                    Plugin.Log.Info($"Caching ident for {level.songName}: {ident}");
 
                     lock (_identCache) {
                         _identCache[level.levelID] = ident;

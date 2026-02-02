@@ -10,14 +10,21 @@ using System.Text;
 static class PlaylistLoadHook {
     static IReadOnlyList<BeatmapLevel> originalLevels;
     static readonly Dictionary<string, string> identCache = new();
+    private static bool levelsReady = false;
 
     static void Prefix(ref IReadOnlyList<BeatmapLevel> beatmapLevels) {
+
         Plugin.Log.Info($"[PlaylistLoadHook] Called with {beatmapLevels?.Count ?? -1} songs. originalLevels is {(originalLevels == null ? "null" : "set")}. Session is {(APConnection.session == null ? "null" : "connected")}");
-        
-        if (originalLevels == null && beatmapLevels.Count > 0) {
-            Plugin.Log.Info($"Initializing with {beatmapLevels.Count} songs");
-            originalLevels = beatmapLevels;
+
+        if (ArchipelagoLevelIndex.AllLevels != null && levelsReady == false) {
+            originalLevels = ArchipelagoLevelIndex.AllLevels;
+            Plugin.Log.Info($"Initializing with {ArchipelagoLevelIndex.AllLevels.Count} songs");
             APConnection.StartIdentBuild(originalLevels);
+            levelsReady = true;
+        }
+
+        if (!ArchipelagoLevelIndex.IsReady) { 
+            BeatSaberAP.Plugin.Log.Info("Building ArchipelagoLevelIndex...");
         }
 
         if (APConnection.session == null) {
@@ -33,7 +40,7 @@ static class PlaylistLoadHook {
 
         beatmapLevels = originalLevels.Where(level => {
             if (!APConnection.TryGetIdent(level.levelID, out var ident)) { 
-                Plugin.Log.Warn("Ident not yet built, could not generate beatmap list");
+                Plugin.Log.Warn($"Could not get Ident for {level.songName}, hiding it from beatmap list");
                 return false; // ident not ready yet
             }
 
@@ -70,10 +77,12 @@ static class PlaylistLoadHook {
         for (int i = 0; i < beatmapLevels.Count; i++) {
             var level = beatmapLevels[i];
             if (!APConnection.TryGetIdent(level.levelID, out var ident)) {
-                Plugin.Log.Warn("Ident not yet built, could not generate beatmap list");
+                Plugin.Log.Warn("[NON DESTRUCTIVE] Ident not yet built, could not generate beatmap list");
                 continue; // ident not ready yet
             }
             Plugin.Log.Debug($"Included beatmap {i}: levelID='{level.levelID}', ident='{ident}'");
         }
+
+        
     }
 }

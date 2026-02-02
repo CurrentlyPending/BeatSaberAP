@@ -1,7 +1,5 @@
 using System;
 using BeatSaberMarkupLanguage;
-using CustomCampaigns.Campaign.Missions;
-using CustomCampaigns.Managers;
 using HarmonyLib;
 using IPA.Utilities;
 using UnityEngine;
