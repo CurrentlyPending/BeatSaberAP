@@ -44,12 +44,9 @@ namespace BeatSaberAP
         }
 
         public static async Task<uint> GetMapIDFromHashAsync(string hash) {
-            Plugin.Log.Debug($"GetMapIDFromHashAsync: input hash='{hash}'");
-            Plugin.Log.Debug("Hash length: " + hash.Length);
             var sd = await sdtask;
             bool found = sd.songs.FindByHash(hash, out Song s);
             uint mapId = found ? s.mapId : 0;
-            Plugin.Log.Debug($"GetMapIDFromHashAsync: hash='{hash}', found={found}, mapId=0x{mapId:X} ({mapId})");
             return mapId;
         }
 

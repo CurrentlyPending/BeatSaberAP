@@ -79,7 +79,7 @@ public static class APConnection {
                 }
             }
         }
-        Plugin.Log.Info($"Connection established, {song_items_received} songs in inventory.");
+        Plugin.Log.Info($"Connection established, {song_items_received+1} songs in inventory.");
 
         session.Items.ItemReceived += RecvItem;
 
@@ -112,7 +112,7 @@ public static class APConnection {
 
         // Find ANY keystr that matches this levelid + characteristic (ignoring difficulty)
         var matchingEntry = IdentToNode.FirstOrDefault(kvp =>
-            kvp.Key.StartsWith(levelIdHex + "_" + characteristic + "_")
+            kvp.Key.StartsWith(levelIdHex + "_" + characteristic + "_", StringComparison.OrdinalIgnoreCase)
         );
 
         if (matchingEntry.Key == null) {
@@ -150,6 +150,11 @@ public static class APConnection {
                 }
 
             }
+        }
+
+        if (item.ItemName == "Victory") {
+            ArchipelagoClientState victoryState = ArchipelagoClientState.ClientGoal;
+            session.SetClientState(victoryState);
         }
         Plugin.Log.Info("Received item " + item.ItemId + " (" + song_items_received + " total song items)");
         TriggerSongListRefresh();
@@ -219,6 +224,9 @@ public static class APConnection {
                     var ident = await GenerateIdentAsync(key);
                     Plugin.Log.Info($"Caching ident for {level.songName}: {ident}");
 
+                    if (ident.StartsWith("OST_") == false && song_unlocks.Any(s => s.StartsWith(ident.Split("_")[0] + "_", StringComparison.OrdinalIgnoreCase))) {
+                        Plugin.Log.Info("Song already unlocked: " + ident);
+                    }
                     lock (_identCache) {
                         _identCache[level.levelID] = ident;
                     }
@@ -259,7 +267,7 @@ public static class APConnection {
         }
 
         string fullIdent = identifier + "_" + key.beatmapCharacteristic.SerializedName() + "_" + ((int)key.difficulty);
-        Plugin.Log.Info("Generated ident: " + fullIdent);
+        Plugin.Log.Info($"Generated ident: {fullIdent}");
         return fullIdent;
     }
 }

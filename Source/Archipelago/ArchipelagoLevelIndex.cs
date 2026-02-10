@@ -30,6 +30,8 @@ internal static class ArchipelagoLevelIndex {
         _levelsModel = SongCore.Loader.BeatmapLevelsModelSO;
         Build();
 
+        // stuffs loaded by now, should be safe to call AbpsHandler
+        ApbsHandler.HandleApbsOnInit();
     }
 
     public static void Build() {

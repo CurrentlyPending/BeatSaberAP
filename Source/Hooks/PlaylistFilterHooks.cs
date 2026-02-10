@@ -63,7 +63,7 @@ static class PlaylistLoadHook {
             }
 
             // Check if any unlocked song matches this map identifier
-            bool isUnlocked = APConnection.song_unlocks.Any(s => s.StartsWith(mapIdentifier + "_"));
+            bool isUnlocked = APConnection.song_unlocks.Any(s => s.StartsWith(mapIdentifier + "_", StringComparison.OrdinalIgnoreCase));
 
             if (isUnlocked) {
                 Plugin.Log.Debug($"Map unlocked - levelID: {level.levelID}, ident: {ident}, identifier: {mapIdentifier}");
