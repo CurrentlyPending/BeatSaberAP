@@ -6,7 +6,9 @@ using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
 using BeatSaberAP;
 using HMUI;
+using IPA.Utilities;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,17 +16,22 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
-using IPA.Utilities;
-
 public static class APConnection {
 
     public static ArchipelagoSession session = null;
     private static DeathLinkService dlservice = null;
     private static Dictionary<uint,string> NodeToIdent = null;
     private static Dictionary<string,uint> IdentToNode = null;
-    public static readonly List<string> song_unlocks = [];
+    public static readonly List<string> SongUnlocks = [];
+    public static readonly List<int> MapTypeCounts = new List<int>();
+    public static Dictionary<string, string> LocationNameToMnemonic = new Dictionary<string, string>();
+    public static string GameMode { get; private set; }
+    public static int NumGrades { get; private set; }
+    private static List<int> StartingNodesList = new List<int>();
     public static string CampaignName { get; private set; }
     public static int song_items_received = 0;
+
+    public static List<int> category_items_received = new List<int>(); // 0: speed, 1: tech, 2: midspeed, 3: acc
 
     private static readonly Dictionary<string, string> _identCache = new();
     private static Task _identBuildTask;
@@ -42,7 +49,7 @@ public static class APConnection {
             return false;
         }
         Plugin.Log.Info("Connected to Archipelago");
-        Dictionary<string,string> conninfo = new();
+        Dictionary<string, string> conninfo = new();
         conninfo["host"] = host;
         conninfo["port"] = port.ToString();
         conninfo["slot"] = slot;
@@ -55,32 +62,72 @@ public static class APConnection {
             dlservice.EnableDeathLink();
             dlservice.OnDeathLinkReceived += RecvDeathLink;
         }
+
+        
+
         CampaignName = (string)success.SlotData["campaign_name"];
-        NodeToIdent = JsonConvert.DeserializeObject<Dictionary<uint,string>>(success.SlotData["node_to_keystr"].ToString());
-        IdentToNode = JsonConvert.DeserializeObject<Dictionary<string,uint>>(success.SlotData["keystr_to_node"].ToString());
-        song_unlocks.AddRange(JsonConvert.DeserializeObject<List<string>>(success.SlotData["start_songs"].ToString()));
+        NodeToIdent = JsonConvert.DeserializeObject<Dictionary<uint, string>>(success.SlotData["node_to_keystr"].ToString());
+        IdentToNode = JsonConvert.DeserializeObject<Dictionary<string, uint>>(success.SlotData["keystr_to_node"].ToString());
+        StartingNodesList.AddRange(JsonConvert.DeserializeObject<List<int>>(success.SlotData["start_songs"].ToString()));
+        MapTypeCounts.AddRange(JsonConvert.DeserializeObject<List<int>>(success.SlotData["map_type_counts"].ToString()));
+        GameMode = JsonConvert.DeserializeObject<String>(success.SlotData["game_mode"].ToString());
+        NumGrades = JsonConvert.DeserializeObject<int>(success.SlotData["num_grades"].ToString());
+        LocationNameToMnemonic = JsonConvert.DeserializeObject<Dictionary<string, string>>(success.SlotData["location_name_to_mnemonic"].ToString());
 
         //Sync Item Counts
         song_items_received = 0;
+        category_items_received = new List<int>() { 0, 0, 0, 0 }; // speed, tech, midspeed, acc
         //First song is always unlocked
 
         Plugin.Log.Info("Songs already in inventory: ");
-        Plugin.Log.Info(song_unlocks[0]);
-        foreach (ItemInfo i in session.Items.AllItemsReceived) {
-            if (i.ItemName == "Progressive Song Unlock") {
-                song_items_received++;
-                if (song_items_received <= NodeToIdent.Count) {
-                    int nodeToUnlock = song_items_received; // Progressive: item 1 unlocks node 1, etc.
 
-                    if (NodeToIdent.ContainsKey((uint)nodeToUnlock)) {
-                        song_unlocks.Add(NodeToIdent[(uint)nodeToUnlock]);
+        if (GameMode == "option_presetPass" || GameMode == "option_presetAccuracy") {
+            Plugin.Log.Info(SongUnlocks[0]);
+
+            foreach (ItemInfo i in session.Items.AllItemsReceived) {
+                if (i.ItemName == "Progressive Song Unlock") {
+                    song_items_received++;
+                    if (song_items_received <= NodeToIdent.Count) {
+                        int NodeToUnlock = song_items_received; // Progressive: item 1 unlocks node 1, etc.
+
+                        if (NodeToIdent.ContainsKey((uint)NodeToUnlock)) {
+                            SongUnlocks.Add(NodeToIdent[(uint)NodeToUnlock]);
+                        }
+                        Plugin.Log.Info(SongUnlocks[NodeToUnlock]);
                     }
-                    Plugin.Log.Info(song_unlocks[nodeToUnlock]);
                 }
             }
-        }
-        Plugin.Log.Info($"Connection established, {song_items_received+1} songs in inventory.");
+        } else {
+            // Unlock starting songs for each category (node id could be different based on generation, so read from slot data)
+            foreach (int i in StartingNodesList) {
+                Plugin.Log.Info("Node unlocked: " + i.ToString());
+                Plugin.Log.Info(NodeToIdent[(uint)i]);
+                SongUnlocks.Add(NodeToIdent[(uint)i]);
+            }
 
+            foreach (ItemInfo i in session.Items.AllItemsReceived) {
+                var categoryIndex = i.ItemName switch {
+                    "Progressive Speed Unlock" => 0,
+                    "Progressive Tech Unlock" => 1,
+                    "Progressive Midspeed Unlock" => 2,
+                    "Progressive Acc Unlock" => 3,
+                    _ => -1
+                };
+                if (categoryIndex >= 0) {
+                    int count = ++category_items_received[categoryIndex];
+                    int offset = MapTypeCounts.Take(categoryIndex).Sum();
+
+                    if (count <= MapTypeCounts[categoryIndex] && NodeToIdent.ContainsKey((uint)count)) {
+                        SongUnlocks.Add(NodeToIdent[(uint)count + (uint)offset]);
+                        Plugin.Log.Info(SongUnlocks[count + offset]);
+                    }
+                }
+
+
+                int total_unlocks_received = category_items_received.Take(3).Sum();
+                Plugin.Log.Info($"Connection established, {StartingNodesList.Count() + total_unlocks_received} songs in inventory.");
+            }
+        }
         session.Items.ItemReceived += RecvItem;
 
         return true;
@@ -96,7 +143,7 @@ public static class APConnection {
         dlservice.SendDeathLink(dl);
     }
 
-    public static async void CheckLocation(BeatmapKey key) {
+    public static async void CheckLocation(BeatmapKey key, string rank) {
         // Use GenerateIdentAsync which properly handles the prefix stripping
         string ident = await GenerateIdentAsync(key);
 
@@ -109,10 +156,16 @@ public static class APConnection {
 
         string levelIdHex = parts[0];
         string characteristic = parts[1];
+        string difficulty = parts[2];
 
-        // Find ANY keystr that matches this levelid + characteristic (ignoring difficulty)
+        if (parts[0] == "OST") {
+            levelIdHex = parts[0] + "_" + parts[1];
+            characteristic = parts[2];
+            difficulty = parts[3];
+        }
+
         var matchingEntry = IdentToNode.FirstOrDefault(kvp =>
-            kvp.Key.StartsWith(levelIdHex + "_" + characteristic + "_", StringComparison.OrdinalIgnoreCase)
+            kvp.Key.StartsWith(levelIdHex + "_" + characteristic + "_" + difficulty, StringComparison.OrdinalIgnoreCase)
         );
 
         if (matchingEntry.Key == null) {
@@ -120,8 +173,38 @@ public static class APConnection {
             return;
         }
 
+        List<string> Grades = new List<string>{ "C", "B", "A", "S", "SS" };
+        int gradeIndex = Grades.IndexOf(rank);
+
+        long[] locationsToCheck = new long[6];
+
+        if (GameMode == "option_presetPass") {
+            session.Locations.CompleteLocationChecks(matchingEntry.Value);
+        } else if (GameMode == "option_presetAccuracy") {
+            for (int i = 0; i <= gradeIndex; i++) locationsToCheck[i] = (matchingEntry.Value * 6 + i);
+            session.Locations.CompleteLocationChecks(locationsToCheck);
+        } else {
+            // Generate location id for all 4 map categories based on how the apworld does it
+            int nodeValue = (int)matchingEntry.Value;
+            int cumulativeCount = 0;
+            int baseId = 0;
+            int localIndex = 0;
+
+            for (int i = 0; i < 4; i++) {
+                if (nodeValue < cumulativeCount + MapTypeCounts[i]) {
+                    baseId = 1000 + (i * 1000);
+                    localIndex = nodeValue - cumulativeCount;
+                    break;
+                }
+                cumulativeCount += MapTypeCounts[i];
+            }
+
+            for (int i = 0; i <= gradeIndex; i++) locationsToCheck[i] = (baseId + (localIndex * 6) + i);
+            session.Locations.CompleteLocationChecks(locationsToCheck);
+
+        }
+
         Plugin.Log.Info("Checked location " + matchingEntry.Value + " with ident " + matchingEntry.Key);
-        session.Locations.CompleteLocationChecks(matchingEntry.Value);
     }
 
     private static void RecvItem(ReceivedItemsHelper helper) {
@@ -142,13 +225,29 @@ public static class APConnection {
                 int nodeToUnlock = song_items_received; // Progressive: item 1 unlocks node 1, etc.
                 
                 if (NodeToIdent.ContainsKey((uint)nodeToUnlock)) {
-                    song_unlocks.Add(NodeToIdent[(uint)nodeToUnlock]);
+                    SongUnlocks.Add(NodeToIdent[(uint)nodeToUnlock]);
                 }
                 Plugin.Log.Info("Currently received songs: ");
-                for(int i=0; i < song_unlocks.Count; i++) {
-                    Plugin.Log.Info(song_unlocks[i]);
+                for(int i=0; i < SongUnlocks.Count; i++) {
+                    Plugin.Log.Info(SongUnlocks[i]);
                 }
 
+            }
+        }
+        var categoryIndex = item.ItemName switch {
+            "Progressive Speed Unlock" => 0,
+            "Progressive Tech Unlock" => 1,
+            "Progressive Midspeed Unlock" => 2,
+            "Progressive Acc Unlock" => 3,
+            _ => -1
+        };
+        if (categoryIndex >= 0) {
+            int count = ++category_items_received[categoryIndex];
+            int offset = MapTypeCounts.Take(categoryIndex).Sum();
+
+            if (count <= MapTypeCounts[categoryIndex] && NodeToIdent.ContainsKey((uint)count)) {
+                SongUnlocks.Add(NodeToIdent[(uint)count + (uint)offset]);
+                Plugin.Log.Info(SongUnlocks[count + offset]);
             }
         }
 
@@ -178,11 +277,11 @@ public static class APConnection {
     public static async Task<bool> HaveSong(BeatmapKey key) {
         string ident = await GenerateIdentAsync(key);
         Plugin.Log.Debug("Queried info for:" + ident);
-        return song_unlocks.Contains(ident);
+        return SongUnlocks.Contains(ident);
     }
     public static bool IsSongUnlocked(string ident) {
         Plugin.Log.Debug("Checking unlock for: " + ident);
-        return song_unlocks.Contains(ident);
+        return SongUnlocks.Contains(ident);
     }
 
     public enum CampaignValidity {
@@ -190,18 +289,6 @@ public static class APConnection {
         WrongCampaign,
         Correct
     }
-    /*
-    public static CampaignValidity CheckCampaignValid(string name) {
-        string selected = CustomCampaignFlowCoordinator.CustomCampaignManager.Campaign.info.name;
-        if (!selected.StartsWith("AP Campaign, ")) return CampaignValidity.NotAP; // None of our business
-        if (selected != APConnection.CampaignName) {
-            // User selected wrong campaign, so mismatch, or CampaignName not initialized, so not connected
-            return CampaignValidity.WrongCampaign;
-        }
-        // Campaign is correct
-        return CampaignValidity.Correct;
-    }
-    */
     public static bool TryGetIdent(string levelId, out string ident) {
         lock (_identCache) {
             return _identCache.TryGetValue(levelId, out ident);
@@ -222,9 +309,9 @@ public static class APConnection {
                         continue;
 
                     var ident = await GenerateIdentAsync(key);
-                    Plugin.Log.Info($"Caching ident for {level.songName}: {ident}");
+                    // Plugin.Log.Info($"Caching ident for {level.songName}: {ident}");
 
-                    if (ident.StartsWith("OST_") == false && song_unlocks.Any(s => s.StartsWith(ident.Split("_")[0] + "_", StringComparison.OrdinalIgnoreCase))) {
+                    if (ident.StartsWith("OST_") == false && SongUnlocks.Any(s => s.StartsWith(ident.Split("_")[0] + "_", StringComparison.OrdinalIgnoreCase))) {
                         Plugin.Log.Info("Song already unlocked: " + ident);
                     }
                     lock (_identCache) {
@@ -267,7 +354,7 @@ public static class APConnection {
         }
 
         string fullIdent = identifier + "_" + key.beatmapCharacteristic.SerializedName() + "_" + ((int)key.difficulty);
-        Plugin.Log.Info($"Generated ident: {fullIdent}");
+        // Plugin.Log.Info($"Generated ident: {fullIdent}");
         return fullIdent;
     }
 }

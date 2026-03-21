@@ -50,7 +50,7 @@ public static class ApbsHandler {
     }
     private static void ProcessApbsFile(string apbsPath, string playlistsPath) {
         Plugin.Log.Info($"Processing {apbsPath}...");
-        // Change extension to .zip
+
         string zipPath = Path.ChangeExtension(apbsPath, ".zip");
 
         if (File.Exists(zipPath))
@@ -59,27 +59,35 @@ public static class ApbsHandler {
         File.Move(apbsPath, zipPath);
 
         using (ZipArchive archive = ZipFile.OpenRead(zipPath)) {
-            // Find the .bplist file
-            ZipArchiveEntry bplistEntry = archive.Entries
-                .FirstOrDefault(e =>
-                    e.FullName.EndsWith(".bplist", StringComparison.OrdinalIgnoreCase));
+            // Verify there's at least one .bplist file before extracting
+            bool hasBplist = archive.Entries
+                .Any(e => e.FullName.EndsWith(".bplist", StringComparison.OrdinalIgnoreCase));
 
-            if (bplistEntry == null)
+            if (!hasBplist)
                 throw new FileNotFoundException("No .bplist found in archive!");
 
-            string outputPath = Path.Combine(
-                playlistsPath,
-                Path.GetFileName(bplistEntry.FullName)
-            );
+            // Extract ALL entries
+            foreach (ZipArchiveEntry entry in archive.Entries) {
+                // Skip directory entries (they have no filename)
+                if (string.IsNullOrEmpty(entry.Name))
+                    continue;
 
-            // Overwrite if exists
-            if (File.Exists(outputPath))
-                File.Delete(outputPath);
+                if (!entry.FullName.EndsWith(".bplist", StringComparison.OrdinalIgnoreCase))
+                    continue;
 
-            bplistEntry.ExtractToFile(outputPath);
+                string outputPath = Path.Combine(
+                    playlistsPath,
+                    Path.GetFileName(entry.FullName)
+                );
+
+                if (File.Exists(outputPath))
+                    File.Delete(outputPath);
+
+                entry.ExtractToFile(outputPath);
+                Plugin.Log.Info($"Extracted: {entry.FullName}");
+            }
         }
 
-        // Delete temporary zip
         File.Delete(zipPath);
     }
 }

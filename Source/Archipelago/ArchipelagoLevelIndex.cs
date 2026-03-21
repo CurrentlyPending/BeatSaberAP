@@ -20,6 +20,7 @@ internal static class ArchipelagoLevelIndex {
     /// </summary>
     public static void Initialize() {
         SongCore.Loader.SongsLoadedEvent += OnSongsLoaded;
+        SongCore.Loader.OnLevelPacksRefreshed += Build;
     }
 
     private static void OnSongsLoaded(Loader loader, ConcurrentDictionary<string, BeatmapLevel> levels) {

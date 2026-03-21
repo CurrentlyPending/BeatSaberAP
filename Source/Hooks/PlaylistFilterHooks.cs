@@ -9,6 +9,7 @@ using System.Text;
 [HarmonyPatch(typeof(LevelCollectionTableView), nameof(LevelCollectionTableView.SetData))]
 static class PlaylistLoadHook {
     static IReadOnlyList<BeatmapLevel> originalLevels;
+    static IReadOnlyList<BeatmapLevel> workingLevels;
     static readonly Dictionary<string, string> identCache = new();
     private static bool levelsReady = false;
 
@@ -38,7 +39,7 @@ static class PlaylistLoadHook {
             return;
         }
 
-        beatmapLevels = originalLevels.Where(level => {
+        workingLevels = originalLevels.Where(level => {
             if (!APConnection.TryGetIdent(level.levelID, out var ident)) { 
                 Plugin.Log.Warn($"Could not get Ident for {level.songName}, hiding it from beatmap list");
                 return false; // ident not ready yet
@@ -63,7 +64,7 @@ static class PlaylistLoadHook {
             }
 
             // Check if any unlocked song matches this map identifier
-            bool isUnlocked = APConnection.song_unlocks.Any(s => s.StartsWith(mapIdentifier + "_", StringComparison.OrdinalIgnoreCase));
+            bool isUnlocked = APConnection.SongUnlocks.Any(s => s.StartsWith(mapIdentifier + "_", StringComparison.OrdinalIgnoreCase));
 
             if (isUnlocked) {
                 Plugin.Log.Debug($"Map unlocked - levelID: {level.levelID}, ident: {ident}, identifier: {mapIdentifier}");
@@ -71,6 +72,10 @@ static class PlaylistLoadHook {
 
             return isUnlocked;
         }).ToList();
+
+        var workingIDs = workingLevels.Select(b => b.levelID).ToHashSet();
+
+        beatmapLevels = beatmapLevels.Where(b => workingIDs.Contains(b.levelID)).ToList();
 
         Plugin.Log.Info($"Filtered playlist from {originalLevels.Count} to {beatmapLevels.Count} beatmaps.");
 
