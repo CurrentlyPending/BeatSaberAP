@@ -8,7 +8,7 @@ public class ArchipelagoFlowCoordinator : FlowCoordinator {
     #pragma warning restore 0649
     private ArchipelagoViewController _apViewCtr;
 
-    protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    public override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
         _apViewCtr ??= BeatSaberUI.CreateViewController<ArchipelagoViewController>();
         if (firstActivation) {
             SetTitle("Archipelago Connection Settings");
@@ -19,7 +19,7 @@ public class ArchipelagoFlowCoordinator : FlowCoordinator {
         }
     }
 
-    protected override void BackButtonWasPressed(ViewController topViewController) {
+    public override void BackButtonWasPressed(ViewController topViewController) {
         _apViewCtr.connStatus.text = "";
         _mainFlowCoordinator.DismissFlowCoordinator(this);
     }

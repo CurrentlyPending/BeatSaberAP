@@ -82,29 +82,34 @@ public static class APConnection {
         Plugin.Log.Info("Songs already in inventory: ");
 
         if (GameMode == "option_presetPass" || GameMode == "option_presetAccuracy") {
-            Plugin.Log.Info(SongUnlocks[0]);
-
+            // Process progressive global song unlocks
             foreach (ItemInfo i in session.Items.AllItemsReceived) {
                 if (i.ItemName == "Progressive Song Unlock") {
                     song_items_received++;
                     if (song_items_received <= NodeToIdent.Count) {
-                        int NodeToUnlock = song_items_received; // Progressive: item 1 unlocks node 1, etc.
+                        int nodeToUnlock = song_items_received; // Progressive: item 1 unlocks node 1, etc.
+                        uint nodeKey = (uint)nodeToUnlock;
 
-                        if (NodeToIdent.ContainsKey((uint)NodeToUnlock)) {
-                            SongUnlocks.Add(NodeToIdent[(uint)NodeToUnlock]);
+                        if (NodeToIdent.ContainsKey(nodeKey)) {
+                            var ident = NodeToIdent[nodeKey];
+                            SongUnlocks.Add(ident);
+                            Plugin.Log.Info("Unlocked: " + ident);
                         }
-                        Plugin.Log.Info(SongUnlocks[NodeToUnlock]);
                     }
                 }
             }
+            Plugin.Log.Info($"Connection established, {SongUnlocks.Count} songs in inventory.");
         } else {
             // Unlock starting songs for each category (node id could be different based on generation, so read from slot data)
             foreach (int i in StartingNodesList) {
                 Plugin.Log.Info("Node unlocked: " + i.ToString());
-                Plugin.Log.Info(NodeToIdent[(uint)i]);
-                SongUnlocks.Add(NodeToIdent[(uint)i]);
+                if (NodeToIdent.TryGetValue((uint)i, out var ident)) {
+                    Plugin.Log.Info(ident);
+                    SongUnlocks.Add(ident);
+                }
             }
 
+            // Process per-category progressive unlocks
             foreach (ItemInfo i in session.Items.AllItemsReceived) {
                 var categoryIndex = i.ItemName switch {
                     "Progressive Speed Unlock" => 0,
@@ -116,17 +121,18 @@ public static class APConnection {
                 if (categoryIndex >= 0) {
                     int count = ++category_items_received[categoryIndex];
                     int offset = MapTypeCounts.Take(categoryIndex).Sum();
+                    uint nodeKey = (uint)(count + offset);
 
-                    if (count <= MapTypeCounts[categoryIndex] && NodeToIdent.ContainsKey((uint)count)) {
-                        SongUnlocks.Add(NodeToIdent[(uint)count + (uint)offset]);
-                        Plugin.Log.Info(SongUnlocks[count + offset]);
+                    if (count <= MapTypeCounts[categoryIndex] && NodeToIdent.ContainsKey(nodeKey)) {
+                        var ident = NodeToIdent[nodeKey];
+                        SongUnlocks.Add(ident);
+                        Plugin.Log.Info("Unlocked: " + ident);
                     }
                 }
-
-
-                int total_unlocks_received = category_items_received.Take(3).Sum();
-                Plugin.Log.Info($"Connection established, {StartingNodesList.Count() + total_unlocks_received} songs in inventory.");
             }
+
+            int total_unlocks_received = category_items_received.Sum();
+            Plugin.Log.Info($"Connection established, {StartingNodesList.Count + total_unlocks_received} songs in inventory.");
         }
         session.Items.ItemReceived += RecvItem;
 
@@ -134,7 +140,8 @@ public static class APConnection {
     }
 
     private static void RecvDeathLink(DeathLink deathLink) {
-        #warning TODO receive deathlink
+        Plugin.Log.Info(deathLink.Cause);
+        DeathlinkClass.ForceFail();
     }
 
     public static void SendDeathLink(string cause) {
@@ -181,7 +188,7 @@ public static class APConnection {
         if (GameMode == "option_presetPass") {
             session.Locations.CompleteLocationChecks(matchingEntry.Value);
         } else if (GameMode == "option_presetAccuracy") {
-            for (int i = 0; i <= gradeIndex; i++) locationsToCheck[i] = (matchingEntry.Value * 6 + i);
+            for (int i = 0; i <= gradeIndex; i++) locationsToCheck[i] = (matchingEntry.Value * 6 + i + 1);
             session.Locations.CompleteLocationChecks(locationsToCheck);
         } else {
             // Generate location id for all 4 map categories based on how the apworld does it
@@ -199,7 +206,7 @@ public static class APConnection {
                 cumulativeCount += MapTypeCounts[i];
             }
 
-            for (int i = 0; i <= gradeIndex; i++) locationsToCheck[i] = (baseId + (localIndex * 6) + i);
+            for (int i = 0; i <= gradeIndex; i++) locationsToCheck[i] = (baseId + (localIndex * 6) + i + 1);
             session.Locations.CompleteLocationChecks(locationsToCheck);
 
         }
@@ -294,6 +301,14 @@ public static class APConnection {
             return _identCache.TryGetValue(levelId, out ident);
         }
     }
+
+    
+    public static void MakePlayerFail() {
+        var gameplayManager = Resources.FindObjectsOfTypeAll<StandardLevelGameplayManager>().FirstOrDefault();
+
+        gameplayManager?.HandleGameEnergyDidReach0();
+    }
+    
 
     public static void StartIdentBuild(IEnumerable<BeatmapLevel> levels) {
         if (_identBuildTask != null)
