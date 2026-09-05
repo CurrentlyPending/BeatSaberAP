@@ -83,9 +83,16 @@ public static class APConnection {
         song_items_received = 0;
         category_items_received = new List<int>() { 0, 0, 0, 0 }; // speed, tech, midspeed, acc
         //First song is always unlocked
-
+        // Unlock starting songs for each category (node id could be different based on generation, so read from slot data)
         Plugin.Log.Info("Songs already in inventory: ");
-
+        foreach (int i in StartingNodesList) {
+            Plugin.Log.Info("Inital Song unlocked: " + i.ToString());
+            if (NodeToIdent.TryGetValue((uint)i, out var ident)) {
+                Plugin.Log.Info(ident);
+                SongUnlocks.Add(ident);
+            }
+        }
+     
         if (GameMode is GameMode.PresetPass or GameMode.PresetAcc) {
             Plugin.Log.Debug("Processing Song Unlocks...");
             // Process progressive global song unlocks
@@ -107,14 +114,6 @@ public static class APConnection {
             }
             Plugin.Log.Info($"Connection established, {SongUnlocks.Count} songs in inventory.");
         } else {
-            // Unlock starting songs for each category (node id could be different based on generation, so read from slot data)
-            foreach (int i in StartingNodesList) {
-                Plugin.Log.Info("Node unlocked: " + i.ToString());
-                if (NodeToIdent.TryGetValue((uint)i, out var ident)) {
-                    Plugin.Log.Info(ident);
-                    SongUnlocks.Add(ident);
-                }
-            }
 
             // Process per-category progressive unlocks
             foreach (ItemInfo i in session.Items.AllItemsReceived) {
