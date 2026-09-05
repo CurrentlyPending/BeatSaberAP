@@ -66,7 +66,7 @@ public static class APConnection {
 
         
         GameMode = (GameMode)JsonConvert.DeserializeObject<int>(success.SlotData["game_mode"].ToString());
-        Plugin.Log.Info("GameMode:" + GameMode);
+        Plugin.Log.Debug("GameMode:" + GameMode);
         CampaignName = (string)success.SlotData["campaign_name"];
         NodeToIdent = JsonConvert.DeserializeObject<Dictionary<uint, string>>(success.SlotData["node_to_keystr"].ToString());
         IdentToNode = JsonConvert.DeserializeObject<Dictionary<string, uint>>(success.SlotData["keystr_to_node"].ToString());
@@ -87,8 +87,10 @@ public static class APConnection {
         Plugin.Log.Info("Songs already in inventory: ");
 
         if (GameMode is GameMode.PresetPass or GameMode.PresetAcc) {
+            Plugin.Log.Debug("Processing Song Unlocks...");
             // Process progressive global song unlocks
             foreach (ItemInfo i in session.Items.AllItemsReceived) {
+                Plugin.Log.Trace("Item: " + i.ItemName);
                 if (i.ItemName == "Progressive Song Unlock") {
                     song_items_received++;
                     if (song_items_received <= NodeToIdent.Count) {
