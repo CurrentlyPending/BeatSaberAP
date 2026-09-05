@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using BeatSaberAP.Archipelago;
 using UnityEngine;
 public static class APConnection {
 
@@ -25,7 +26,7 @@ public static class APConnection {
     public static readonly List<string> SongUnlocks = [];
     public static readonly List<int> MapTypeCounts = new List<int>();
     public static Dictionary<string, string> LocationNameToMnemonic = new Dictionary<string, string>();
-    public static string GameMode { get; private set; }
+    public static GameMode GameMode { get; private set; }
     public static int NumGrades { get; private set; }
     private static List<int> StartingNodesList = new List<int>();
     public static string CampaignName { get; private set; }
@@ -64,13 +65,17 @@ public static class APConnection {
         }
 
         
-
+        GameMode = (GameMode)JsonConvert.DeserializeObject<int>(success.SlotData["game_mode"].ToString());
+        Plugin.Log.Debug("GameMode:" + GameMode);
         CampaignName = (string)success.SlotData["campaign_name"];
         NodeToIdent = JsonConvert.DeserializeObject<Dictionary<uint, string>>(success.SlotData["node_to_keystr"].ToString());
         IdentToNode = JsonConvert.DeserializeObject<Dictionary<string, uint>>(success.SlotData["keystr_to_node"].ToString());
         StartingNodesList.AddRange(JsonConvert.DeserializeObject<List<int>>(success.SlotData["start_songs"].ToString()));
-        MapTypeCounts.AddRange(JsonConvert.DeserializeObject<List<int>>(success.SlotData["map_type_counts"].ToString()));
-        GameMode = JsonConvert.DeserializeObject<String>(success.SlotData["game_mode"].ToString());
+        // this is never used unless its not these two
+        if (GameMode is not (GameMode.PresetAcc or GameMode.PresetPass)) {
+            MapTypeCounts.AddRange(
+                JsonConvert.DeserializeObject<List<int>>(success.SlotData["map_type_counts"].ToString()));
+        }
         NumGrades = JsonConvert.DeserializeObject<int>(success.SlotData["num_grades"].ToString());
         LocationNameToMnemonic = JsonConvert.DeserializeObject<Dictionary<string, string>>(success.SlotData["location_name_to_mnemonic"].ToString());
 
@@ -78,12 +83,21 @@ public static class APConnection {
         song_items_received = 0;
         category_items_received = new List<int>() { 0, 0, 0, 0 }; // speed, tech, midspeed, acc
         //First song is always unlocked
-
+        // Unlock starting songs for each category (node id could be different based on generation, so read from slot data)
         Plugin.Log.Info("Songs already in inventory: ");
-
-        if (GameMode == "option_presetPass" || GameMode == "option_presetAccuracy") {
+        foreach (int i in StartingNodesList) {
+            Plugin.Log.Info("Inital Song unlocked: " + i.ToString());
+            if (NodeToIdent.TryGetValue((uint)i, out var ident)) {
+                Plugin.Log.Info(ident);
+                SongUnlocks.Add(ident);
+            }
+        }
+     
+        if (GameMode is GameMode.PresetPass or GameMode.PresetAcc) {
+            Plugin.Log.Debug("Processing Song Unlocks...");
             // Process progressive global song unlocks
             foreach (ItemInfo i in session.Items.AllItemsReceived) {
+                Plugin.Log.Trace("Item: " + i.ItemName);
                 if (i.ItemName == "Progressive Song Unlock") {
                     song_items_received++;
                     if (song_items_received <= NodeToIdent.Count) {
@@ -100,14 +114,6 @@ public static class APConnection {
             }
             Plugin.Log.Info($"Connection established, {SongUnlocks.Count} songs in inventory.");
         } else {
-            // Unlock starting songs for each category (node id could be different based on generation, so read from slot data)
-            foreach (int i in StartingNodesList) {
-                Plugin.Log.Info("Node unlocked: " + i.ToString());
-                if (NodeToIdent.TryGetValue((uint)i, out var ident)) {
-                    Plugin.Log.Info(ident);
-                    SongUnlocks.Add(ident);
-                }
-            }
 
             // Process per-category progressive unlocks
             foreach (ItemInfo i in session.Items.AllItemsReceived) {
@@ -185,9 +191,9 @@ public static class APConnection {
 
         long[] locationsToCheck = new long[6];
 
-        if (GameMode == "option_presetPass") {
+        if (GameMode == GameMode.PresetPass) {
             session.Locations.CompleteLocationChecks(matchingEntry.Value);
-        } else if (GameMode == "option_presetAccuracy") {
+        } else if (GameMode == GameMode.PresetAcc) {
             for (int i = 0; i <= gradeIndex; i++) locationsToCheck[i] = (matchingEntry.Value * 6 + i + 1);
             session.Locations.CompleteLocationChecks(locationsToCheck);
         } else {
