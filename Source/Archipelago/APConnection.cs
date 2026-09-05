@@ -71,8 +71,11 @@ public static class APConnection {
         NodeToIdent = JsonConvert.DeserializeObject<Dictionary<uint, string>>(success.SlotData["node_to_keystr"].ToString());
         IdentToNode = JsonConvert.DeserializeObject<Dictionary<string, uint>>(success.SlotData["keystr_to_node"].ToString());
         StartingNodesList.AddRange(JsonConvert.DeserializeObject<List<int>>(success.SlotData["start_songs"].ToString()));
-        MapTypeCounts.AddRange(JsonConvert.DeserializeObject<List<int>>(success.SlotData["map_type_counts"].ToString()));
-        GameMode = JsonConvert.DeserializeObject<String>(success.SlotData["game_mode"].ToString());
+        // this is never used unless its not these two
+        if (GameMode is not (GameMode.PresetAcc or GameMode.PresetPass)) {
+            MapTypeCounts.AddRange(
+                JsonConvert.DeserializeObject<List<int>>(success.SlotData["map_type_counts"].ToString()));
+        }
         NumGrades = JsonConvert.DeserializeObject<int>(success.SlotData["num_grades"].ToString());
         LocationNameToMnemonic = JsonConvert.DeserializeObject<Dictionary<string, string>>(success.SlotData["location_name_to_mnemonic"].ToString());
 
