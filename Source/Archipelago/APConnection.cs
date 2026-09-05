@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using BeatSaberAP.Archipelago;
 using UnityEngine;
 public static class APConnection {
 
@@ -25,7 +26,7 @@ public static class APConnection {
     public static readonly List<string> SongUnlocks = [];
     public static readonly List<int> MapTypeCounts = new List<int>();
     public static Dictionary<string, string> LocationNameToMnemonic = new Dictionary<string, string>();
-    public static string GameMode { get; private set; }
+    public static GameMode GameMode { get; private set; }
     public static int NumGrades { get; private set; }
     private static List<int> StartingNodesList = new List<int>();
     public static string CampaignName { get; private set; }
@@ -64,7 +65,8 @@ public static class APConnection {
         }
 
         
-
+        GameMode = (GameMode)JsonConvert.DeserializeObject<int>(success.SlotData["game_mode"].ToString());
+        Plugin.Log.Info("GameMode:" + GameMode);
         CampaignName = (string)success.SlotData["campaign_name"];
         NodeToIdent = JsonConvert.DeserializeObject<Dictionary<uint, string>>(success.SlotData["node_to_keystr"].ToString());
         IdentToNode = JsonConvert.DeserializeObject<Dictionary<string, uint>>(success.SlotData["keystr_to_node"].ToString());
@@ -81,7 +83,7 @@ public static class APConnection {
 
         Plugin.Log.Info("Songs already in inventory: ");
 
-        if (GameMode == "option_presetPass" || GameMode == "option_presetAccuracy") {
+        if (GameMode is GameMode.PresetPass or GameMode.PresetAcc) {
             // Process progressive global song unlocks
             foreach (ItemInfo i in session.Items.AllItemsReceived) {
                 if (i.ItemName == "Progressive Song Unlock") {
@@ -185,9 +187,9 @@ public static class APConnection {
 
         long[] locationsToCheck = new long[6];
 
-        if (GameMode == "option_presetPass") {
+        if (GameMode == GameMode.PresetPass) {
             session.Locations.CompleteLocationChecks(matchingEntry.Value);
-        } else if (GameMode == "option_presetAccuracy") {
+        } else if (GameMode == GameMode.PresetAcc) {
             for (int i = 0; i <= gradeIndex; i++) locationsToCheck[i] = (matchingEntry.Value * 6 + i + 1);
             session.Locations.CompleteLocationChecks(locationsToCheck);
         } else {
