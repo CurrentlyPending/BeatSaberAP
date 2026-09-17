@@ -15,31 +15,31 @@ using BeatSaberAP.Archipelago;
 using UnityEngine;
 public static class APConnection {
 
-    public static ArchipelagoSession session;
-    private static DeathLinkService dlservice;
-    private static Dictionary<uint,string> NodeToIdent;
-    private static Dictionary<string,uint> IdentToNode;
+    public static ArchipelagoSession Session;
+    private static DeathLinkService _dlService;
+    private static Dictionary<uint,string> _nodeToIdent;
+    private static Dictionary<string,uint> _identToNode;
     public static readonly List<string> SongUnlocks = [];
-    public static readonly List<int> MapTypeCounts = [];
-    public static GameMode GameMode { get; private set; }
+    private static readonly List<int> MapTypeCounts = [];
+    private static GameMode GameMode { get; set; }
     public static int NumGrades { get; private set; }
-    private static List<int> StartingNodesList = [];
+    private static List<int> _startingNodesList = [];
     public static string CampaignName { get; private set; }
-    public static int song_items_received = 0;
+    private static int _songItemsReceived;
 
-    public static List<int> category_items_received = []; // 0: speed, 1: tech, 2: midspeed, 3: acc
+    private static List<int> _categoryItemsReceived = []; // 0: speed, 1: tech, 2: midspeed, 3: acc
 
-    private static readonly Dictionary<string, string> _identCache = new();
+    private static readonly Dictionary<string, string> IdentCache = new();
     private static Task _identBuildTask;
-    public static volatile bool _identReady = false;
+    public static volatile bool IdentReady;
 
-    static readonly FieldInfo tableViewField =
+    private static readonly FieldInfo TableViewField =
     typeof(LevelCollectionTableView)
         .GetField("_tableView", BindingFlags.Instance | BindingFlags.NonPublic);
 
     public static bool ConnectAndGetSlotData(string host, int port, string slot, string password) {
-        session = ArchipelagoSessionFactory.CreateSession(host, port);
-        LoginResult result = session.TryConnectAndLogin("Beat Saber", slot, ItemsHandlingFlags.AllItems, new(0, 6, 2), null, null, password);
+        Session = ArchipelagoSessionFactory.CreateSession(host, port);
+        LoginResult result = Session.TryConnectAndLogin("Beat Saber", slot, ItemsHandlingFlags.AllItems, new(0, 6, 2), null, null, password);
         if (!result.Successful) {
             Plugin.Log.Error("Could not connect to Archipelago!");
             return false;
@@ -51,22 +51,22 @@ public static class APConnection {
             ["slot"] = slot,
             ["password"] = password
         };
-        string json_conn = JsonConvert.SerializeObject(conninfo);
-        System.IO.File.WriteAllText("AP_ConnInfo.json", json_conn);
+        string jsonConn = JsonConvert.SerializeObject(conninfo);
+        System.IO.File.WriteAllText("AP_ConnInfo.json", jsonConn);
         var success = (LoginSuccessful)result;
         if ((long)success.SlotData["DeathLink"] == 1) {
-            dlservice = session.CreateDeathLinkService();
-            dlservice.EnableDeathLink();
-            dlservice.OnDeathLinkReceived += RecvDeathLink;
+            _dlService = Session.CreateDeathLinkService();
+            _dlService.EnableDeathLink();
+            _dlService.OnDeathLinkReceived += RecvDeathLink;
         }
 
         
         GameMode = (GameMode)JsonConvert.DeserializeObject<int>(success.SlotData["game_mode"].ToString());
         Plugin.Log.Debug("GameMode:" + GameMode);
         CampaignName = (string)success.SlotData["campaign_name"];
-        NodeToIdent = JsonConvert.DeserializeObject<Dictionary<uint, string>>(success.SlotData["node_to_keystr"].ToString());
-        IdentToNode = JsonConvert.DeserializeObject<Dictionary<string, uint>>(success.SlotData["keystr_to_node"].ToString());
-        StartingNodesList.AddRange(JsonConvert.DeserializeObject<List<int>>(success.SlotData["start_songs"].ToString()));
+        _nodeToIdent = JsonConvert.DeserializeObject<Dictionary<uint, string>>(success.SlotData["node_to_keystr"].ToString());
+        _identToNode = JsonConvert.DeserializeObject<Dictionary<string, uint>>(success.SlotData["keystr_to_node"].ToString());
+        _startingNodesList.AddRange(JsonConvert.DeserializeObject<List<int>>(success.SlotData["start_songs"].ToString()));
         // this is never used unless its not these two
         if (GameMode is not (GameMode.PresetAcc or GameMode.PresetPass)) {
             MapTypeCounts.AddRange(
@@ -76,14 +76,14 @@ public static class APConnection {
         JsonConvert.DeserializeObject<Dictionary<string, string>>(success.SlotData["location_name_to_mnemonic"].ToString());
 
         //Sync Item Counts
-        song_items_received = 0;
-        category_items_received = new List<int>() { 0, 0, 0, 0 }; // speed, tech, midspeed, acc
+        _songItemsReceived = 0;
+        _categoryItemsReceived = new List<int>() { 0, 0, 0, 0 }; // speed, tech, midspeed, acc
         //First song is always unlocked
         // Unlock starting songs for each category (node id could be different based on generation, so read from slot data)
         Plugin.Log.Info("Songs already in inventory: ");
-        foreach (int i in StartingNodesList) {
+        foreach (int i in _startingNodesList) {
             Plugin.Log.Info("Inital Song unlocked: " + i);
-            if (NodeToIdent.TryGetValue((uint)i, out var ident)) {
+            if (_nodeToIdent.TryGetValue((uint)i, out var ident)) {
                 Plugin.Log.Info(ident);
                 SongUnlocks.Add(ident);
             }
@@ -92,16 +92,16 @@ public static class APConnection {
         if (GameMode is GameMode.PresetPass or GameMode.PresetAcc) {
             Plugin.Log.Debug("Processing Song Unlocks...");
             // Process progressive global song unlocks
-            foreach (ItemInfo i in session.Items.AllItemsReceived) {
+            foreach (ItemInfo i in Session.Items.AllItemsReceived) {
                 Plugin.Log.Trace("Item: " + i.ItemName);
                 if (i.ItemName != "Progressive Song Unlock") continue;
-                song_items_received++;
-                if (song_items_received > NodeToIdent.Count) continue;
-                int nodeToUnlock = song_items_received; // Progressive: item 1 unlocks node 1, etc.
+                _songItemsReceived++;
+                if (_songItemsReceived > _nodeToIdent.Count) continue;
+                int nodeToUnlock = _songItemsReceived; // Progressive: item 1 unlocks node 1, etc.
                 uint nodeKey = (uint)nodeToUnlock;
 
-                if (!NodeToIdent.ContainsKey(nodeKey)) continue;
-                var ident = NodeToIdent[nodeKey];
+                if (!_nodeToIdent.ContainsKey(nodeKey)) continue;
+                var ident = _nodeToIdent[nodeKey];
                 SongUnlocks.Add(ident);
                 Plugin.Log.Info("Unlocked: " + ident);
             }
@@ -109,7 +109,7 @@ public static class APConnection {
         } else {
 
             // Process per-category progressive unlocks
-            foreach (ItemInfo i in session.Items.AllItemsReceived) {
+            foreach (ItemInfo i in Session.Items.AllItemsReceived) {
                 var categoryIndex = i.ItemName switch {
                     "Progressive Speed Unlock" => 0,
                     "Progressive Tech Unlock" => 1,
@@ -118,20 +118,20 @@ public static class APConnection {
                     _ => -1
                 };
                 if (categoryIndex < 0) continue;
-                int count = ++category_items_received[categoryIndex];
+                int count = ++_categoryItemsReceived[categoryIndex];
                 int offset = MapTypeCounts.Take(categoryIndex).Sum();
                 uint nodeKey = (uint)(count + offset);
 
-                if (count > MapTypeCounts[categoryIndex] || !NodeToIdent.ContainsKey(nodeKey)) continue;
-                var ident = NodeToIdent[nodeKey];
+                if (count > MapTypeCounts[categoryIndex] || !_nodeToIdent.ContainsKey(nodeKey)) continue;
+                var ident = _nodeToIdent[nodeKey];
                 SongUnlocks.Add(ident);
                 Plugin.Log.Info("Unlocked: " + ident);
             }
 
-            int total_unlocks_received = category_items_received.Sum();
-            Plugin.Log.Info($"Connection established, {StartingNodesList.Count + total_unlocks_received} songs in inventory.");
+            int totalUnlocksReceived = _categoryItemsReceived.Sum();
+            Plugin.Log.Info($"Connection established, {_startingNodesList.Count + totalUnlocksReceived} songs in inventory.");
         }
-        session.Items.ItemReceived += RecvItem;
+        Session.Items.ItemReceived += RecvItem;
 
         return true;
     }
@@ -142,9 +142,9 @@ public static class APConnection {
     }
 
     public static void SendDeathLink(string cause) {
-        if (dlservice == null) return;
-        DeathLink dl = new(session.Players.ActivePlayer.Alias, cause);
-        dlservice.SendDeathLink(dl);
+        if (_dlService == null) return;
+        DeathLink dl = new(Session.Players.ActivePlayer.Alias, cause);
+        _dlService.SendDeathLink(dl);
     }
 
     public static async void CheckLocation(BeatmapKey key, string rank) {
@@ -169,7 +169,7 @@ public static class APConnection {
             difficulty = parts[3];
         }
 
-        var matchingEntry = IdentToNode.FirstOrDefault(kvp =>
+        var matchingEntry = _identToNode.FirstOrDefault(kvp =>
             kvp.Key.StartsWith(levelIdHex + "_" + characteristic + "_" + difficulty, StringComparison.OrdinalIgnoreCase)
         );
 
@@ -178,20 +178,20 @@ public static class APConnection {
             return;
         }
 
-        List<string> Grades = new List<string>{ "C", "B", "A", "S", "SS" };
-        int gradeIndex = Grades.IndexOf(rank);
+        List<string> grades = ["C", "B", "A", "S", "SS"];
+        int gradeIndex = grades.IndexOf(rank);
 
         long[] locationsToCheck = new long[6];
 
         switch (GameMode)
         {
             case GameMode.PresetPass:
-                await session.Locations.CompleteLocationChecksAsync(matchingEntry.Value);
+                await Session.Locations.CompleteLocationChecksAsync(matchingEntry.Value);
                 break;
             case GameMode.PresetAcc:
             {
                 for (int i = 0; i <= gradeIndex; i++) locationsToCheck[i] = (matchingEntry.Value * 6 + i + 1);
-                await session.Locations.CompleteLocationChecksAsync(locationsToCheck);
+                await Session.Locations.CompleteLocationChecksAsync(locationsToCheck);
                 break;
             }
             default:
@@ -212,7 +212,7 @@ public static class APConnection {
                 }
 
                 for (int i = 0; i <= gradeIndex; i++) locationsToCheck[i] = (baseId + (localIndex * 6) + i + 1);
-                await session.Locations.CompleteLocationChecksAsync(locationsToCheck);
+                await Session.Locations.CompleteLocationChecksAsync(locationsToCheck);
                 break;
             }
         }
@@ -232,13 +232,13 @@ public static class APConnection {
         }
 
         if (item.ItemName == "Progressive Song Unlock") {
-            song_items_received++;
+            _songItemsReceived++;
 
-            if (song_items_received <= NodeToIdent.Count) {
-                int nodeToUnlock = song_items_received; // Progressive: item 1 unlocks node 1, etc.
+            if (_songItemsReceived <= _nodeToIdent.Count) {
+                int nodeToUnlock = _songItemsReceived; // Progressive: item 1 unlocks node 1, etc.
                 
-                if (NodeToIdent.ContainsKey((uint)nodeToUnlock)) {
-                    SongUnlocks.Add(NodeToIdent[(uint)nodeToUnlock]);
+                if (_nodeToIdent.ContainsKey((uint)nodeToUnlock)) {
+                    SongUnlocks.Add(_nodeToIdent[(uint)nodeToUnlock]);
                 }
                 Plugin.Log.Info("Currently received songs: ");
                 foreach (var t in SongUnlocks)
@@ -256,20 +256,20 @@ public static class APConnection {
             _ => -1
         };
         if (categoryIndex >= 0) {
-            int count = ++category_items_received[categoryIndex];
+            int count = ++_categoryItemsReceived[categoryIndex];
             int offset = MapTypeCounts.Take(categoryIndex).Sum();
 
-            if (count <= MapTypeCounts[categoryIndex] && NodeToIdent.ContainsKey((uint)count)) {
-                SongUnlocks.Add(NodeToIdent[(uint)count + (uint)offset]);
+            if (count <= MapTypeCounts[categoryIndex] && _nodeToIdent.ContainsKey((uint)count)) {
+                SongUnlocks.Add(_nodeToIdent[(uint)count + (uint)offset]);
                 Plugin.Log.Info(SongUnlocks[count + offset]);
             }
         }
 
         if (item.ItemName == "Victory") {
             ArchipelagoClientState victoryState = ArchipelagoClientState.ClientGoal;
-            session.SetClientState(victoryState);
+            Session.SetClientState(victoryState);
         }
-        Plugin.Log.Info("Received item " + item.ItemId + " (" + song_items_received + " total song items)");
+        Plugin.Log.Info("Received item " + item.ItemId + " (" + _songItemsReceived + " total song items)");
         TriggerSongListRefresh();
     }
 
@@ -282,7 +282,7 @@ public static class APConnection {
             if (table == null)
                 return;
 
-            var tv = tableViewField.GetValue(table) as TableView;
+            var tv = TableViewField.GetValue(table) as TableView;
             tv?.ReloadData();
         });
     }
@@ -299,8 +299,8 @@ public static class APConnection {
     }
 
     public static bool TryGetIdent(string levelId, out string ident) {
-        lock (_identCache) {
-            return _identCache.TryGetValue(levelId, out ident);
+        lock (IdentCache) {
+            return IdentCache.TryGetValue(levelId, out ident);
         }
     }
 
@@ -331,20 +331,20 @@ public static class APConnection {
                     if (ident.StartsWith("OST_") == false && SongUnlocks.Any(s => s.StartsWith(ident.Split("_")[0] + "_", StringComparison.OrdinalIgnoreCase))) {
                         Plugin.Log.Info("Song already unlocked: " + ident);
                     }
-                    lock (_identCache) {
-                        _identCache[level.levelID] = ident;
+                    lock (IdentCache) {
+                        IdentCache[level.levelID] = ident;
                     }
                 } catch (Exception ex) {
                     Plugin.Log.Warn($"Ident build failed for {level.levelID}: {ex}");
                 }
             }
 
-            _identReady = true;
+            IdentReady = true;
         });
         Plugin.Log.Info("Identity Build Complete.");
     }
 
-    public static bool AreIdentsReady => _identReady;
+    public static bool AreIdentsReady => IdentReady;
 
     public static async Task<string> GenerateIdentAsync(BeatmapKey key) {
         // Normalize level id (remove common prefixes that appear in gameplay)
