@@ -15,20 +15,19 @@ using BeatSaberAP.Archipelago;
 using UnityEngine;
 public static class APConnection {
 
-    public static ArchipelagoSession session = null;
-    private static DeathLinkService dlservice = null;
-    private static Dictionary<uint,string> NodeToIdent = null;
-    private static Dictionary<string,uint> IdentToNode = null;
+    public static ArchipelagoSession session;
+    private static DeathLinkService dlservice;
+    private static Dictionary<uint,string> NodeToIdent;
+    private static Dictionary<string,uint> IdentToNode;
     public static readonly List<string> SongUnlocks = [];
-    public static readonly List<int> MapTypeCounts = new List<int>();
-    public static Dictionary<string, string> LocationNameToMnemonic = new Dictionary<string, string>();
+    public static readonly List<int> MapTypeCounts = [];
     public static GameMode GameMode { get; private set; }
     public static int NumGrades { get; private set; }
-    private static List<int> StartingNodesList = new List<int>();
+    private static List<int> StartingNodesList = [];
     public static string CampaignName { get; private set; }
     public static int song_items_received = 0;
 
-    public static List<int> category_items_received = new List<int>(); // 0: speed, 1: tech, 2: midspeed, 3: acc
+    public static List<int> category_items_received = []; // 0: speed, 1: tech, 2: midspeed, 3: acc
 
     private static readonly Dictionary<string, string> _identCache = new();
     private static Task _identBuildTask;
@@ -74,7 +73,7 @@ public static class APConnection {
                 JsonConvert.DeserializeObject<List<int>>(success.SlotData["map_type_counts"].ToString()));
         }
         NumGrades = JsonConvert.DeserializeObject<int>(success.SlotData["num_grades"].ToString());
-        LocationNameToMnemonic = JsonConvert.DeserializeObject<Dictionary<string, string>>(success.SlotData["location_name_to_mnemonic"].ToString());
+        JsonConvert.DeserializeObject<Dictionary<string, string>>(success.SlotData["location_name_to_mnemonic"].ToString());
 
         //Sync Item Counts
         song_items_received = 0;
@@ -95,19 +94,16 @@ public static class APConnection {
             // Process progressive global song unlocks
             foreach (ItemInfo i in session.Items.AllItemsReceived) {
                 Plugin.Log.Trace("Item: " + i.ItemName);
-                if (i.ItemName == "Progressive Song Unlock") {
-                    song_items_received++;
-                    if (song_items_received <= NodeToIdent.Count) {
-                        int nodeToUnlock = song_items_received; // Progressive: item 1 unlocks node 1, etc.
-                        uint nodeKey = (uint)nodeToUnlock;
+                if (i.ItemName != "Progressive Song Unlock") continue;
+                song_items_received++;
+                if (song_items_received > NodeToIdent.Count) continue;
+                int nodeToUnlock = song_items_received; // Progressive: item 1 unlocks node 1, etc.
+                uint nodeKey = (uint)nodeToUnlock;
 
-                        if (NodeToIdent.ContainsKey(nodeKey)) {
-                            var ident = NodeToIdent[nodeKey];
-                            SongUnlocks.Add(ident);
-                            Plugin.Log.Info("Unlocked: " + ident);
-                        }
-                    }
-                }
+                if (!NodeToIdent.ContainsKey(nodeKey)) continue;
+                var ident = NodeToIdent[nodeKey];
+                SongUnlocks.Add(ident);
+                Plugin.Log.Info("Unlocked: " + ident);
             }
             Plugin.Log.Info($"Connection established, {SongUnlocks.Count} songs in inventory.");
         } else {
@@ -121,17 +117,15 @@ public static class APConnection {
                     "Progressive Acc Unlock" => 3,
                     _ => -1
                 };
-                if (categoryIndex >= 0) {
-                    int count = ++category_items_received[categoryIndex];
-                    int offset = MapTypeCounts.Take(categoryIndex).Sum();
-                    uint nodeKey = (uint)(count + offset);
+                if (categoryIndex < 0) continue;
+                int count = ++category_items_received[categoryIndex];
+                int offset = MapTypeCounts.Take(categoryIndex).Sum();
+                uint nodeKey = (uint)(count + offset);
 
-                    if (count <= MapTypeCounts[categoryIndex] && NodeToIdent.ContainsKey(nodeKey)) {
-                        var ident = NodeToIdent[nodeKey];
-                        SongUnlocks.Add(ident);
-                        Plugin.Log.Info("Unlocked: " + ident);
-                    }
-                }
+                if (count > MapTypeCounts[categoryIndex] || !NodeToIdent.ContainsKey(nodeKey)) continue;
+                var ident = NodeToIdent[nodeKey];
+                SongUnlocks.Add(ident);
+                Plugin.Log.Info("Unlocked: " + ident);
             }
 
             int total_unlocks_received = category_items_received.Sum();
@@ -189,31 +183,38 @@ public static class APConnection {
 
         long[] locationsToCheck = new long[6];
 
-        if (GameMode == GameMode.PresetPass) {
-             await session.Locations.CompleteLocationChecksAsync(matchingEntry.Value);
-
-        } else if (GameMode == GameMode.PresetAcc) {
-            for (int i = 0; i <= gradeIndex; i++) locationsToCheck[i] = (matchingEntry.Value * 6 + i + 1);
-            await session.Locations.CompleteLocationChecksAsync(locationsToCheck);
-        } else {
-            // Generate location id for all 4 map categories based on how the apworld does it
-            int nodeValue = (int)matchingEntry.Value;
-            int cumulativeCount = 0;
-            int baseId = 0;
-            int localIndex = 0;
-
-            for (int i = 0; i < 4; i++) {
-                if (nodeValue < cumulativeCount + MapTypeCounts[i]) {
-                    baseId = 1000 + (i * 1000);
-                    localIndex = nodeValue - cumulativeCount;
-                    break;
-                }
-                cumulativeCount += MapTypeCounts[i];
+        switch (GameMode)
+        {
+            case GameMode.PresetPass:
+                await session.Locations.CompleteLocationChecksAsync(matchingEntry.Value);
+                break;
+            case GameMode.PresetAcc:
+            {
+                for (int i = 0; i <= gradeIndex; i++) locationsToCheck[i] = (matchingEntry.Value * 6 + i + 1);
+                await session.Locations.CompleteLocationChecksAsync(locationsToCheck);
+                break;
             }
+            default:
+            {
+                // Generate location id for all 4 map categories based on how the apworld does it
+                int nodeValue = (int)matchingEntry.Value;
+                int cumulativeCount = 0;
+                int baseId = 0;
+                int localIndex = 0;
 
-            for (int i = 0; i <= gradeIndex; i++) locationsToCheck[i] = (baseId + (localIndex * 6) + i + 1);
-            await session.Locations.CompleteLocationChecksAsync(locationsToCheck);
+                for (int i = 0; i < 4; i++) {
+                    if (nodeValue < cumulativeCount + MapTypeCounts[i]) {
+                        baseId = 1000 + (i * 1000);
+                        localIndex = nodeValue - cumulativeCount;
+                        break;
+                    }
+                    cumulativeCount += MapTypeCounts[i];
+                }
 
+                for (int i = 0; i <= gradeIndex; i++) locationsToCheck[i] = (baseId + (localIndex * 6) + i + 1);
+                await session.Locations.CompleteLocationChecksAsync(locationsToCheck);
+                break;
+            }
         }
 
         Plugin.Log.Info("Checked location " + matchingEntry.Value + " with ident " + matchingEntry.Key);
@@ -240,8 +241,9 @@ public static class APConnection {
                     SongUnlocks.Add(NodeToIdent[(uint)nodeToUnlock]);
                 }
                 Plugin.Log.Info("Currently received songs: ");
-                for(int i=0; i < SongUnlocks.Count; i++) {
-                    Plugin.Log.Info(SongUnlocks[i]);
+                foreach (var t in SongUnlocks)
+                {
+                    Plugin.Log.Info(t);
                 }
 
             }
@@ -296,11 +298,6 @@ public static class APConnection {
         return SongUnlocks.Contains(ident);
     }
 
-    public enum CampaignValidity {
-        NotAP,
-        WrongCampaign,
-        Correct
-    }
     public static bool TryGetIdent(string levelId, out string ident) {
         lock (_identCache) {
             return _identCache.TryGetValue(levelId, out ident);
