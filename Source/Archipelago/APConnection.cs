@@ -186,7 +186,7 @@ public static class APConnection {
         switch (GameMode)
         {
             case GameMode.PresetPass:
-                await Session.Locations.CompleteLocationChecksAsync(matchingEntry.Value);
+                await Session.Locations.CompleteLocationChecksAsync(matchingEntry.Value*6);
                 break;
             case GameMode.PresetAcc:
             {
