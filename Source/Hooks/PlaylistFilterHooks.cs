@@ -15,7 +15,7 @@ static class PlaylistLoadHook {
 
     static void Prefix(ref IReadOnlyList<BeatmapLevel> beatmapLevels) {
 
-        Plugin.Log.Info($"[PlaylistLoadHook] Called with {beatmapLevels?.Count ?? -1} songs. originalLevels is {(originalLevels == null ? "null" : "set")}. Session is {(APConnection.session == null ? "null" : "connected")}");
+        Plugin.Log.Info($"[PlaylistLoadHook] Called with {beatmapLevels?.Count ?? -1} songs. originalLevels is {(originalLevels == null ? "null" : "set")}. Session is {(APConnection.Session == null ? "null" : "connected")}");
 
         if (ArchipelagoLevelIndex.AllLevels != null && levelsReady == false) {
             originalLevels = ArchipelagoLevelIndex.AllLevels;
@@ -28,12 +28,12 @@ static class PlaylistLoadHook {
             BeatSaberAP.Plugin.Log.Info("Building ArchipelagoLevelIndex...");
         }
 
-        if (APConnection.session == null) {
+        if (APConnection.Session == null) {
             beatmapLevels = Array.Empty<BeatmapLevel>();
             return;
         }
         
-        if (!APConnection._identReady) {
+        if (!APConnection.IdentReady) {
             beatmapLevels = Array.Empty<BeatmapLevel>(); 
             Plugin.Log.Info("Identity cache constructing...");
             return;
