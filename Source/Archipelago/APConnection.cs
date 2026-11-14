@@ -68,7 +68,7 @@ public static class APConnection {
         _identToNode = JsonConvert.DeserializeObject<Dictionary<string, uint>>(success.SlotData["keystr_to_node"].ToString());
         _startingNodesList.AddRange(JsonConvert.DeserializeObject<List<int>>(success.SlotData["start_songs"].ToString()));
         // this is never used unless its not these two
-        if (GameMode is not (GameMode.PresetAcc or GameMode.PresetPass)) {
+        if (GameMode is not (GameMode.Preset or GameMode.PresetPass)) {
             MapTypeCounts.AddRange(
                 JsonConvert.DeserializeObject<List<int>>(success.SlotData["map_type_counts"].ToString()));
         }
@@ -77,7 +77,7 @@ public static class APConnection {
 
         //Sync Item Counts
         _songItemsReceived = 0;
-        _categoryItemsReceived = new List<int>() { 0, 0, 0, 0 }; // speed, tech, midspeed, acc
+        _categoryItemsReceived = new List<int>() { 0, 0, 0, 0 }; // speed, tech, midspeed, 
         //First song is always unlocked
         // Unlock starting songs for each category (node id could be different based on generation, so read from slot data)
         Plugin.Log.Info("Songs already in inventory: ");
@@ -89,7 +89,7 @@ public static class APConnection {
             }
         }
      
-        if (GameMode is GameMode.PresetPass or GameMode.PresetAcc) {
+        if (GameMode is GameMode.PresetPass or GameMode.Preset) {
             Plugin.Log.Debug("Processing Song Unlocks...");
             // Process progressive global song unlocks
             foreach (ItemInfo i in Session.Items.AllItemsReceived) {
@@ -114,7 +114,7 @@ public static class APConnection {
                     "Progressive Speed Unlock" => 0,
                     "Progressive Tech Unlock" => 1,
                     "Progressive Midspeed Unlock" => 2,
-                    "Progressive Acc Unlock" => 3,
+                    "Progressive Accuracy Unlock" => 3,
                     _ => -1
                 };
                 if (categoryIndex < 0) continue;
@@ -252,7 +252,7 @@ public static class APConnection {
             "Progressive Speed Unlock" => 0,
             "Progressive Tech Unlock" => 1,
             "Progressive Midspeed Unlock" => 2,
-            "Progressive Acc Unlock" => 3,
+            "Progressive Accuracy Unlock" => 3,
             _ => -1
         };
         if (categoryIndex >= 0) {
