@@ -11,7 +11,7 @@ static class PlaylistLoadHook {
     static IReadOnlyList<BeatmapLevel> originalLevels;
     static IReadOnlyList<BeatmapLevel> workingLevels;
     static readonly Dictionary<string, string> identCache = new();
-    private static bool levelsReady = false;
+    public static bool levelsReady = false;
 
     static void Prefix(ref IReadOnlyList<BeatmapLevel> beatmapLevels) {
 
@@ -40,11 +40,11 @@ static class PlaylistLoadHook {
         }
 
         workingLevels = originalLevels.Where(level => {
+            
             if (!APConnection.TryGetIdent(level.levelID, out var ident)) { 
                 Plugin.Log.Warn($"Could not get Ident for {level.songName}, hiding it from beatmap list");
                 return false; // ident not ready yet
             }
-
             // Extract the identifier portion (everything before characteristic)
             // For custom maps: "43A2E_Standard_4" -> "43A2E"
             // For official maps: "OST_100Bills_Standard_2" -> "OST_100Bills"
@@ -66,16 +66,26 @@ static class PlaylistLoadHook {
             // Check if any unlocked song matches this map identifier
             bool isUnlocked = APConnection.SongUnlocks.Any(s => s.StartsWith(mapIdentifier + "_", StringComparison.OrdinalIgnoreCase));
 
+            if (!APConnection.IdentToNode.Keys.Any(s => s.Contains(mapIdentifier, StringComparison.OrdinalIgnoreCase))) {
+                Plugin.Log.Info("Song not part of archipelago world, showing.");
+                return true;
+            }
+
             if (isUnlocked) {
-                Plugin.Log.Debug($"Map unlocked - levelID: {level.levelID}, ident: {ident}, identifier: {mapIdentifier}");
+                Plugin.Log.Info($"Map unlocked - levelID: {level.levelID}, ident: {ident}, identifier: {mapIdentifier}");
             }
 
             return isUnlocked;
         }).ToList();
 
+        Plugin.Log.Info($"Song unlocks length: {APConnection.SongUnlocks.Count}");
+        Plugin.Log.Info($"Working levels length: {workingLevels.Count}");
+
         var workingIDs = workingLevels.Select(b => b.levelID).ToHashSet();
 
         beatmapLevels = beatmapLevels.Where(b => workingIDs.Contains(b.levelID)).ToList();
+
+        Plugin.Log.Info($"Beatmap levels length: {beatmapLevels.Count}");
 
         Plugin.Log.Info($"Filtered playlist from {originalLevels.Count} to {beatmapLevels.Count} beatmaps.");
 
@@ -85,7 +95,7 @@ static class PlaylistLoadHook {
                 Plugin.Log.Warn("[NON DESTRUCTIVE] Ident not yet built, could not generate beatmap list");
                 continue; // ident not ready yet
             }
-            Plugin.Log.Debug($"Included beatmap {i}: levelID='{level.levelID}', ident='{ident}'");
+            
         }
 
         

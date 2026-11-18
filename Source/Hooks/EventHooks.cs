@@ -17,8 +17,8 @@ public static class EventHooks {
         string practiceResult = __instance.practiceSettings == null ? "null" : "not null";
         Plugin.Log.Info($"Practice settings is {practiceResult}");
 
-        if (levelCompletionResults.levelEndStateType == LevelCompletionResults.LevelEndStateType.Failed 
-            && ArchipelagoLevelIndex.ArchipelagoLevels.Contains(__instance.beatmapLevel)) APConnection.SendDeathLink("too many bloqs :(");
+        if (levelCompletionResults.levelEndStateType == LevelCompletionResults.LevelEndStateType.Failed) 
+            APConnection.SendDeathLink("too many bloqs :(");
 
 
     

@@ -5,6 +5,7 @@ using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
 using BeatSaberAP;
+using BeatSaberAP.Archipelago;
 using HMUI;
 using IPA.Utilities;
 using Newtonsoft.Json;
@@ -12,6 +13,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -20,13 +22,16 @@ public static class APConnection {
 
     public static ArchipelagoSession session = null;
     private static DeathLinkService dlservice = null;
-    private static Dictionary<uint,string> NodeToIdent = null;
-    private static Dictionary<string,uint> IdentToNode = null;
+    public static Dictionary<uint,string> NodeToIdent = null;
+    public static Dictionary<string, uint> IdentToNode = null;
     public static readonly List<string> SongUnlocks = [];
     public static readonly List<int> MapTypeCounts = new List<int>();
     public static Dictionary<string, string> LocationNameToMnemonic = new Dictionary<string, string>();
     public static string GameMode { get; private set; }
+    public static bool LockGoalMap { get; private set; }
     public static int NumGrades { get; private set; }
+    public static int BloqKeysRequired { get; private set; }
+    public static int GoalNodeId { get; private set; }
     private static List<int> StartingNodesList = new List<int>();
     public static string CampaignName { get; private set; }
     public static int song_items_received = 0;
@@ -63,8 +68,7 @@ public static class APConnection {
             dlservice.OnDeathLinkReceived += RecvDeathLink;
         }
 
-        
-
+        // Slot Data
         CampaignName = (string)success.SlotData["campaign_name"];
         NodeToIdent = JsonConvert.DeserializeObject<Dictionary<uint, string>>(success.SlotData["node_to_keystr"].ToString());
         IdentToNode = JsonConvert.DeserializeObject<Dictionary<string, uint>>(success.SlotData["keystr_to_node"].ToString());
@@ -73,7 +77,11 @@ public static class APConnection {
         GameMode = JsonConvert.DeserializeObject<String>(success.SlotData["game_mode"].ToString());
         NumGrades = JsonConvert.DeserializeObject<int>(success.SlotData["num_grades"].ToString());
         LocationNameToMnemonic = JsonConvert.DeserializeObject<Dictionary<string, string>>(success.SlotData["location_name_to_mnemonic"].ToString());
+        LockGoalMap = JsonConvert.DeserializeObject<bool>(success.SlotData["lock_goal_map"].ToString());
+        GoalNodeId = JsonConvert.DeserializeObject<int>(success.SlotData["goal_node_id"].ToString());
+        BloqKeysRequired = JsonConvert.DeserializeObject<int>(success.SlotData["bloq_keys_required"].ToString());
 
+        
         //Sync Item Counts
         song_items_received = 0;
         category_items_received = new List<int>() { 0, 0, 0, 0 }; // speed, tech, midspeed, acc
@@ -129,6 +137,8 @@ public static class APConnection {
                         Plugin.Log.Info("Unlocked: " + ident);
                     }
                 }
+                int maxValue = MapTypeCounts.Max();
+
             }
 
             int total_unlocks_received = category_items_received.Sum();
@@ -262,6 +272,10 @@ public static class APConnection {
             ArchipelagoClientState victoryState = ArchipelagoClientState.ClientGoal;
             session.SetClientState(victoryState);
         }
+
+        if (item.ItemName == "Bloq Key")   
+            GoalMap.UpdateGoalMap();
+
         Plugin.Log.Info("Received item " + item.ItemId + " (" + song_items_received + " total song items)");
         TriggerSongListRefresh();
     }
@@ -340,6 +354,7 @@ public static class APConnection {
             _identReady = true;
         });
         Plugin.Log.Info("Identity Build Complete.");
+        _identBuildTask = null;
     }
 
     public static bool AreIdentsReady => _identReady;
