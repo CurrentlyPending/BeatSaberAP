@@ -7,52 +7,40 @@
       "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\archipelago\\apconnection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\archipelago\\archipelagolevelindex.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\archipelago\\archipelagolevelindex.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\manifest.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\manifest.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\hooks\\playlistfilterhooks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\hooks\\playlistfilterhooks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\beatsaberap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\beatsaberap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\hooks\\eventhooks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\hooks\\eventhooks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\hooks\\lockhooks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\hooks\\lockhooks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\archipelago\\deathlink.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\archipelago\\deathlink.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\archipelago\\goalmap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\archipelago\\goalmap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\ui\\archipelagoflowcoordinator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\ui\\archipelagoflowcoordinator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\ui\\archipelagoviewcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\ui\\archipelagoviewcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\ui\\menubuttonmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\ui\\menubuttonmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\ui\\archipelagoflowcoordinator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\ui\\archipelagoflowcoordinator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\archipelago\\deathlink.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\archipelago\\deathlink.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\injectinstaller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\injectinstaller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\hooks\\eventhooks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\hooks\\eventhooks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\hooks\\playlistfilterhooks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\hooks\\playlistfilterhooks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\archipelago\\archipelagolevelindex.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\archipelago\\archipelagolevelindex.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\beatsaberap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\beatsaberap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\hooks\\lockhooks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|solutionrelative:source\\hooks\\lockhooks.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{FC7FF0C4-8F9F-43B9-963F-5C8B3B8920AF}|Source\\BeatSaberAP.csproj|c:\\users\\zotov\\downloads\\beatsaberap-master\\source\\apbshandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -70,32 +58,32 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "manifest.json",
-              "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\manifest.json",
-              "RelativeDocumentMoniker": "Source\\manifest.json",
-              "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\manifest.json",
-              "RelativeToolTip": "Source\\manifest.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-05-26T20:07:16.074Z",
+              "DocumentIndex": 4,
+              "Title": "InjectInstaller.cs",
+              "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\InjectInstaller.cs",
+              "RelativeDocumentMoniker": "Source\\InjectInstaller.cs",
+              "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\InjectInstaller.cs",
+              "RelativeToolTip": "Source\\InjectInstaller.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-28T21:50:15.574Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "ArchipelagoLevelIndex.cs",
-              "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Archipelago\\ArchipelagoLevelIndex.cs",
-              "RelativeDocumentMoniker": "Source\\Archipelago\\ArchipelagoLevelIndex.cs",
-              "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Archipelago\\ArchipelagoLevelIndex.cs",
-              "RelativeToolTip": "Source\\Archipelago\\ArchipelagoLevelIndex.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAWAAAAAAAAAA==",
+              "DocumentIndex": 3,
+              "Title": "Deathlink.cs",
+              "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Archipelago\\Deathlink.cs",
+              "RelativeDocumentMoniker": "Source\\Archipelago\\Deathlink.cs",
+              "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Archipelago\\Deathlink.cs",
+              "RelativeToolTip": "Source\\Archipelago\\Deathlink.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-18T02:04:08.842Z",
+              "WhenOpened": "2026-03-28T21:33:49.296Z",
               "EditorCaption": ""
             },
             {
@@ -106,33 +94,23 @@
               "RelativeDocumentMoniker": "Source\\Hooks\\EventHooks.cs",
               "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Hooks\\EventHooks.cs",
               "RelativeToolTip": "Source\\Hooks\\EventHooks.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAACAAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAABoAAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-18T01:54:39.498Z"
+              "WhenOpened": "2026-03-18T01:54:39.498Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 6,
-              "Title": "LockHooks.cs",
-              "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Hooks\\LockHooks.cs",
-              "RelativeDocumentMoniker": "Source\\Hooks\\LockHooks.cs",
-              "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Hooks\\LockHooks.cs",
-              "RelativeToolTip": "Source\\Hooks\\LockHooks.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Title": "PlaylistFilterHooks.cs",
+              "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Hooks\\PlaylistFilterHooks.cs",
+              "RelativeDocumentMoniker": "Source\\Hooks\\PlaylistFilterHooks.cs",
+              "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Hooks\\PlaylistFilterHooks.cs",
+              "RelativeToolTip": "Source\\Hooks\\PlaylistFilterHooks.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEkAAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-18T23:31:22.841Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "BeatSaberAP.cs",
-              "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\BeatSaberAP.cs",
-              "RelativeDocumentMoniker": "Source\\BeatSaberAP.cs",
-              "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\BeatSaberAP.cs",
-              "RelativeToolTip": "Source\\BeatSaberAP.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAACAAAAARAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-28T21:49:44.263Z"
+              "WhenOpened": "2026-03-18T02:18:37.495Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -142,87 +120,14 @@
               "RelativeDocumentMoniker": "Source\\Archipelago\\APConnection.cs",
               "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Archipelago\\APConnection.cs",
               "RelativeToolTip": "Source\\Archipelago\\APConnection.cs",
-              "ViewState": "AgIAAGMAAAAAAAAAAAArwHMAAAArAAAAAAAAAA==",
+              "ViewState": "AgIAAGIAAAAAAAAAAAAIwIoAAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-27T21:23:47.016Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "Deathlink.cs",
-              "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Archipelago\\Deathlink.cs",
-              "RelativeDocumentMoniker": "Source\\Archipelago\\Deathlink.cs",
-              "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Archipelago\\Deathlink.cs",
-              "RelativeToolTip": "Source\\Archipelago\\Deathlink.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-28T21:33:49.296Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "PlaylistFilterHooks.cs",
-              "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Hooks\\PlaylistFilterHooks.cs",
-              "RelativeDocumentMoniker": "Source\\Hooks\\PlaylistFilterHooks.cs",
-              "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Hooks\\PlaylistFilterHooks.cs",
-              "RelativeToolTip": "Source\\Hooks\\PlaylistFilterHooks.cs",
-              "ViewState": "AgIAADMAAAAAAAAAAAAkwD0AAABBAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-18T02:18:37.495Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "GoalMap.cs",
-              "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Archipelago\\GoalMap.cs",
-              "RelativeDocumentMoniker": "Source\\Archipelago\\GoalMap.cs",
-              "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Archipelago\\GoalMap.cs",
-              "RelativeToolTip": "Source\\Archipelago\\GoalMap.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAAABMAAAA3AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-27T20:08:26.526Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "ArchipelagoViewController.cs",
-              "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\UI\\ArchipelagoViewController.cs",
-              "RelativeDocumentMoniker": "Source\\UI\\ArchipelagoViewController.cs",
-              "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\UI\\ArchipelagoViewController.cs",
-              "RelativeToolTip": "Source\\UI\\ArchipelagoViewController.cs",
-              "ViewState": "AgIAADUAAAAAAAAAAAAIwAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-18T18:27:30.343Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "MenuButtonManager.cs",
-              "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\UI\\MenuButtonManager.cs",
-              "RelativeDocumentMoniker": "Source\\UI\\MenuButtonManager.cs",
-              "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\UI\\MenuButtonManager.cs",
-              "RelativeToolTip": "Source\\UI\\MenuButtonManager.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-04T23:32:41.646Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "InjectInstaller.cs",
-              "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\InjectInstaller.cs",
-              "RelativeDocumentMoniker": "Source\\InjectInstaller.cs",
-              "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\InjectInstaller.cs",
-              "RelativeToolTip": "Source\\InjectInstaller.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-28T21:50:15.574Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 1,
               "Title": "ArchipelagoFlowCoordinator.cs",
               "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\UI\\ArchipelagoFlowCoordinator.cs",
               "RelativeDocumentMoniker": "Source\\UI\\ArchipelagoFlowCoordinator.cs",
@@ -230,11 +135,64 @@
               "RelativeToolTip": "Source\\UI\\ArchipelagoFlowCoordinator.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-28T21:50:33.693Z"
+              "WhenOpened": "2026-03-28T21:50:33.693Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 8,
+              "Title": "BeatSaberAP.cs",
+              "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\BeatSaberAP.cs",
+              "RelativeDocumentMoniker": "Source\\BeatSaberAP.cs",
+              "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\BeatSaberAP.cs",
+              "RelativeToolTip": "Source\\BeatSaberAP.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAACAAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-28T21:49:44.263Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ArchipelagoLevelIndex.cs",
+              "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Archipelago\\ArchipelagoLevelIndex.cs",
+              "RelativeDocumentMoniker": "Source\\Archipelago\\ArchipelagoLevelIndex.cs",
+              "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Archipelago\\ArchipelagoLevelIndex.cs",
+              "RelativeToolTip": "Source\\Archipelago\\ArchipelagoLevelIndex.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAmwBYAAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-18T02:04:08.842Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ArchipelagoViewController.cs",
+              "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\UI\\ArchipelagoViewController.cs",
+              "RelativeDocumentMoniker": "Source\\UI\\ArchipelagoViewController.cs",
+              "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\UI\\ArchipelagoViewController.cs",
+              "RelativeToolTip": "Source\\UI\\ArchipelagoViewController.cs",
+              "ViewState": "AgIAACcAAAAAAAAAAAAowAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-18T18:27:30.343Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "LockHooks.cs",
+              "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Hooks\\LockHooks.cs",
+              "RelativeDocumentMoniker": "Source\\Hooks\\LockHooks.cs",
+              "ToolTip": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\Hooks\\LockHooks.cs",
+              "RelativeToolTip": "Source\\Hooks\\LockHooks.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-18T23:31:22.841Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
               "Title": "ApbsHandler.cs",
               "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\ApbsHandler.cs",
               "RelativeDocumentMoniker": "Source\\ApbsHandler.cs",
@@ -242,11 +200,12 @@
               "RelativeToolTip": "Source\\ApbsHandler.cs",
               "ViewState": "AgIAADsAAAAAAAAAAAAkwE0AAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-18T16:53:39.231Z"
+              "WhenOpened": "2026-03-18T16:53:39.231Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 11,
               "Title": "MainThreadDispatcher.cs",
               "DocumentMoniker": "C:\\Users\\zotov\\Downloads\\BeatSaberAP-master\\Source\\MainThreadDispatcher.cs",
               "RelativeDocumentMoniker": "Source\\MainThreadDispatcher.cs",
@@ -254,7 +213,8 @@
               "RelativeToolTip": "Source\\MainThreadDispatcher.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-28T21:50:26.596Z"
+              "WhenOpened": "2026-03-28T21:50:26.596Z",
+              "EditorCaption": ""
             }
           ]
         }
