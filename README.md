@@ -11,7 +11,8 @@
    - BeatSaberPlaylistsLib
    - PlaylistManager
 4. Drag BeatSaberAP_bundle.dll into your BSManager/BSInstances/\[your version]/Plugins folder
-5. Drag the patch file (itll have a .apbs file extension) into your Playlists folder
+5. After the multiworld room is created, download the `.apbs` patch file.
+6. Drag the `.apbs` patch file into Beat Saber's `Playlists` folder. (May need to create it if BS hasn't been launched yet).
 7. Launch the game once, then restart it
 
 There should appear an archipelago button on the left. You will not see any beatmaps in your game until you connect to a valid archipelago session.
